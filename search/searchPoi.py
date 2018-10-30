@@ -5,6 +5,7 @@ import sys
 from urllib import request
 import json
 import math
+import redis
 
 url = "https://restapi.amap.com/v3/place/polygon?"
 key = "dd414d3d690331b29f1b25aeebd7c4fd"
@@ -23,28 +24,33 @@ def searchPOIByDistrict(
               + "," + str(latitude3) + "|" + str(longitude4) + "," + str(latitude4)
     integrityUrl = url + "key=" + key + "&types=" + types + "&output=" + output + "&polygon=" + polygon + "&offset=" + str(offset)
 
+    # 保存结果
     pois = []
     response = request.urlopen(integrityUrl + "&page=" + str(page))
     data = response.read().decode()
     json_data = json.loads(data)
-    pois.append(json_data['pois'])
+    pois.extend(json_data['pois'])
 
     pageNo = math.ceil(float(json_data['count']) / offset)
 
     if pageNo > 1:
-        for p in range(1, pageNo):
+        for p in range(2, pageNo + 1):
             json_data = json.loads(request.urlopen(integrityUrl + "&page=" + str(p)).read().decode())
-            pois.append(json_data['pois'])
+            pois.extend(json_data['pois'])
 
-    print(pois)
+    return pois
+
+def saveToRedis() :
+    r = redis.Redis(host='127.0.0.1',port=6379)
+    r.set('foo','foo')
 
 
 def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    searchPOIByDistrict(114.052926, 22.539593, 114.061039, 22.540564, 114.060833, 22.534785, 114.053213, 22.534462)
-
+    # searchPOIByDistrict(114.052926, 22.539593, 114.061039, 22.540564, 114.060833, 22.534785, 114.053213, 22.534462)
+    saveToRedis()
 
 if __name__ == "__main__":
     sys.exit(main())
