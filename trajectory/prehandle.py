@@ -3,7 +3,10 @@ import sys
 from concurrent.futures import ThreadPoolExecutor
 import os
 import datetime
-import cal_distance
+from trajectory.cal_distance import haversine
+import redis
+from shenzhen_map.save_region import is_point_in_polygon
+import json
 
 
 def divide_trajectory_by_car(file_path, file_name):
@@ -29,7 +32,7 @@ def divide_trajectory_by_car(file_path, file_name):
     pool = ThreadPoolExecutor(4)
 
     dictionary = file_name.split(".")[0][0:-5]
-    dic_path = "F:/FCD data/trajectory/" + dictionary
+    dic_path = "F:/FCD data/trajectory_day_car/" + dictionary
     if not os.path.exists(dic_path):
         os.mkdir(dic_path)
     for key in plateNumber_dict.keys():
@@ -37,6 +40,27 @@ def divide_trajectory_by_car(file_path, file_name):
 
     # print(plateNumber_dict)
     file.close()
+
+
+# 从redis中读取城市区域划分
+def get_region():
+    r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
+    taz_dict = {}
+    for i in range(1, 1068):
+        taz_id = "taz_" + str(i)
+        polygon = str(r.get(taz_id), 'utf-8')
+        taz_dict[taz_id] = list(json.loads(polygon))
+    return taz_dict
+
+
+# 判断坐标点所在的位置
+def get_point_region(point):
+    taz_dict = get_region()
+    for key in taz_dict.keys():
+        polygon = taz_dict.get(key)
+        if is_point_in_polygon(point, polygon):
+            return str(key).split("_")[1]
+    return -1
 
 
 # 对车辆轨迹进行错误轨迹点过滤
@@ -72,7 +96,7 @@ def filter_trajectory_point(dict):
 
 
 def get_distance_diff(pre_longitude, pre_latitude, longitude, latitude):
-    return cal_distance.haversine(pre_longitude, pre_latitude, longitude, latitude)
+    return haversine(pre_longitude, pre_latitude, longitude, latitude)
 
 
 # 时间差值（以秒为单位）
@@ -80,7 +104,6 @@ def get_time_diff(time_a, time_b):
     t_a = datetime.datetime.strptime(time_a, "%Y-%m-%d %H:%M:%S")
     t_b = datetime.datetime.strptime(time_b, "%Y-%m-%d %H:%M:%S")
     return (t_b - t_a).seconds
-
 
 
 # 写入文件
@@ -119,10 +142,16 @@ def simplify_line(line):
     latitude = records[2].split(':')[1] if len(records[0].split(':')) > 0 else ''
     time = records[3][3:] if len(records[0].split(':')) > 0 else ''
     status = records[8].split(':')[1] if len(records[0].split(':')) > 0 else ''
+
+    # 判断区域
+    region = get_point_region([float(longitude), float(latitude)])
+    if region == -1:
+        return ''
+
     if plate_no == '' or longitude == '' or latitude == '' or time == '' or status == '':
         return ''
     new_line = plate_no + ";" + str(float(longitude) / 1000000) + ";" + str(float(latitude) / 1000000) + ";" + \
-               time + ";" + status + "\n"
+               time + ";" + status + ";" + region + "\n"
     return new_line
 
 
