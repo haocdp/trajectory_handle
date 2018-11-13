@@ -84,9 +84,11 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    # file_path = "F:\FCD data\shenzhen_map/taz.geojson"
-    # handle_file(file_path)
-    print(is_point_in_polygon([0.8,0.8], [[0.4,0],[1,1],[0,1],[0,0]]))
+    file_path = "F:\FCD data\shenzhen_map/taz.geojson"
+    handle_file(file_path)
+    # print(is_point_in_polygon([22.704432, 114.006278], [[22.707596, 113.884718],[22.682573, 113.891597],[22.667053, 113.895037],
+    #                                       [22.665795, 113.937948], [22.683216, 113.973996],[22.708242, 113.961295],
+    #                                       [22.729149, 113.943437], [22.655967, 113.899160],[22.707596, 113.884718]]))
 
 
 if __name__ == "__main__":

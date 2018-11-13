@@ -6,6 +6,7 @@ from urllib import request
 import json
 import math
 import redis
+from concurrent.futures import ThreadPoolExecutor
 
 url = "https://restapi.amap.com/v3/place/polygon?"
 key = "dd414d3d690331b29f1b25aeebd7c4fd"
@@ -16,16 +17,16 @@ extensions = "base"
 page = 1
 offset = 20
 
+r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
+
 
 # 调用高德地图API获取区域内的POI
-def searchPOIByDistrict(
-        longitude1, latitude1,
-        longitude2, latitude2,
-        longitude3, latitude3,
-        longitude4, latitude4
-):
-    polygon = str(longitude1) + "," + str(latitude1) + "|" + str(longitude2) + "," + str(latitude2) + "|" \
-              + str(longitude3) + "," + str(latitude3) + "|" + str(longitude4) + "," + str(latitude4)
+def searchPOIByDistrict(polygon_list):
+    length = len(polygon_list)
+    if length <= 0:
+        return ""
+    polygon_str = [str(point[0]) + "," + str(point[1]) for point in polygon_list]
+    polygon = "|".join(polygon_str)
     integrityUrl = url + "key=" + key + "&types=" + types + "&output=" + output + "&polygon=" + polygon \
                    + "&offset=" + str(offset) + "&extensions=" + extensions
 
@@ -47,17 +48,22 @@ def searchPOIByDistrict(
 
 
 # 调用searchPOIByDistrict获取区域所有POI并存入redis中
-def saveToRedis():
-    r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
-
-    pois = \
-        searchPOIByDistrict(114.052926, 22.539593, 114.061039, 22.540564, 114.060833, 22.534785, 114.053213, 22.534462)
+def saveToRedis(id, polygon):
+    pois = searchPOIByDistrict(polygon)
+    if pois == "":
+        return
     # print(pois)
     # print(json.dumps(pois, ensure_ascii=False))
-    r.set('districtId', json.dumps(pois, ensure_ascii=False))
+    r.set('taz_poi_' + str(id), json.dumps(pois, ensure_ascii=False))
+    saveToFile(id, pois)
     # p = r.get("districtId")
     # a = p.decode('utf-8')
-    # print(a)
+
+
+def saveToFile(id, pois):
+    file = open("F:\FCD data\shenzhen_map_poi/taz_poi_" + str(id), 'w')
+    file.write(str(pois))
+    file.close()
 
 
 # 根据区域ID获取最能表示区域语义的POI标号
@@ -76,16 +82,24 @@ def getPOIofDistrict(districtId='districtId'):
     return sorted(types.items(), key=lambda x: x[1], reverse=True)[0][0]
 
 
+
+def saveToRedis_1(id):
+    polygon = list(json.loads(str(r.get("taz_" + str(id)), 'utf-8')))
+    polygon = [point for key, point in enumerate(polygon) if key % 2 == 0]
+    saveToRedis(id, polygon)
+    print(id)
+
+
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
 
     # saveToRedis()
     # print(getPOIofDistrict())
-
-    r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
-    s = "粤"
-    print(s)
+    pool = ThreadPoolExecutor(8)
+    for i in range(64, 1068):
+        pool.submit(saveToRedis_1(i))
 
 
 if __name__ == "__main__":
