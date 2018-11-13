@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import math
 import time
 from sklearn.cluster import DBSCAN
+from sklearn import metrics
+from collections import Counter
 
 UNCLASSIFIED = False
 NOISE = 0
@@ -122,19 +124,53 @@ def load_dataset(filename):
 
 
 def main():
-    dataSet = load_dataset('F:\FCD data\\trajectory\workday_point\\cluster_test.txt')
-    dataSet = np.mat(dataSet).transpose()
+    # dataSet = load_dataset('F:\FCD data\\trajectory\workday_point\\cluster_test.txt')
+    # dataSet = np.mat(dataSet).transpose()
     # print(dataSet)
-    clusters, clusterNum = dbscan(dataSet, 2, 15)
-    print("cluster Numbers = ", clusterNum)
-    print(clusters)
-    plotFeature(dataSet, clusters, clusterNum)
+    # clusters, clusterNum = dbscan(dataSet, 2, 15)
+    # print("cluster Numbers = ", clusterNum)
+    # print(clusters)
+    # plotFeature(dataSet, clusters, clusterNum)
 
-    # dataset = load_dataset('F:\FCD data\\trajectory\workday_point\\cluster_test.txt')
-    # dataset_array = np.array(dataset)
-    # y_pred_DBSCAN = DBSCAN(eps=2, min_samples=15).fit_predict(dataset_array)
-    # plt.scatter(dataset_array[:, 0], dataset_array[:, 1], c=y_pred_DBSCAN)
-    # plt.show()
+    dataset = load_dataset('F:\FCD data\\trajectory\workday_point\\youke_2011-7-4')
+    dataset_array = np.array(dataset)
+    db = DBSCAN(eps=0.0005, min_samples=5, metric='haversine').fit(dataset_array)
+
+    core_samples_mask = np.zeros_like(db.labels_, dtype=bool)
+    core_samples_mask[db.core_sample_indices_] = True
+    labels = db.labels_
+
+    new_dataset = []
+    new_labels = []
+    list_labels = list(labels)
+    dict_lables = Counter(list_labels)
+    for key, value in enumerate(list_labels):
+        if value == -1 or dict_lables[value] < 20:
+            continue
+        new_dataset.append(dataset[key])
+        new_labels.append(value)
+    new_dataset = np.array(new_dataset)
+    dict_lables = Counter(new_labels)
+    print(dict_lables)
+
+
+    # single_class_dataset = []
+    # single_class_labels = []
+    # for key, value in enumerate(list_labels):
+    #     if value == -1:
+    #         continue
+    #     single_class_dataset.append(dataset[key])
+    #     single_class_labels.append(value)
+    # single_class_dataset = np.array(single_class_dataset)
+
+
+    # Number of clusters in labels, ignoring noise if present.
+    n_clusters_ = len(set(labels)) - (1 if -1 in labels else 0)
+
+    print('Estimated number of clusters: %d' % n_clusters_)
+
+    plt.scatter(new_dataset[:, 0], new_dataset[:, 1], c=new_labels, s=10, cmap='seismic')
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -142,4 +178,3 @@ if __name__ == '__main__':
     main()
     end = time.clock()
     print('finish all in %s' % str(end - start))
-    plt.show()
