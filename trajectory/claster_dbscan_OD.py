@@ -18,7 +18,7 @@ def load_dataset(filename):
             if line == '' or line == '\n':
                 continue
             trajectory = literal_eval(line.strip('\n'))
-            if len(trajectory) <= 40:
+            if len(trajectory) <= 10:
                 continue
             origin_dataSet.append(list(map(float, trajectory[0][:2])))
             destination_dataSet.append(list(map(float, trajectory[len(trajectory) - 1][:2])))
@@ -37,38 +37,45 @@ def main():
     origin_dataset, destination_dataSet = load_dataset('F:\FCD data\\trajectory\workday_trajectory\\youke_0')
     origin_dataset_array = np.array(origin_dataset)
     destination_dataset_array = np.array(destination_dataSet)
-    origin_db = DBSCAN(eps=0.001, min_samples=50, metric='haversine').fit(origin_dataset_array)
-    destination_db = DBSCAN(eps=0.001, min_samples=20, metric='haversine').fit(destination_dataset_array)
+    origin_db = DBSCAN(eps=0.0002, min_samples=20, metric='haversine').fit(origin_dataset_array)
+    destination_db = DBSCAN(eps=0.0002, min_samples=20, metric='haversine').fit(destination_dataset_array)
 
     origin_labels = origin_db.labels_
     destination_labels = destination_db.labels_
 
-    # new_dataset = []
-    # new_labels = []
-    # list_labels = list(origin_labels)
-    # dict_lables = Counter(list_labels)
-    # for key, value in enumerate(list_labels):
-    #     if value == -1 or dict_lables[value] < 20:
-    #         continue
-    #     new_dataset.append(origin_dataset[key])
-    #     new_labels.append(value)
-    # new_dataset = np.array(new_dataset)
-    # dict_lables = Counter(new_labels)
-    # print(dict_lables)
-
-    new_dataset = []
-    new_labels = []
-    list_labels = list(destination_labels)
-    dict_lables = Counter(list_labels)
-    for key, value in enumerate(list_labels):
-        if value == -1 or dict_lables[value] < 20:
+    '''
+        origin points cluster
+    '''
+    origin_new_dataset = []
+    origin_new_labels = []
+    origin_list_labels = list(origin_labels)
+    origin_dict_lables = Counter(origin_list_labels)
+    for key, value in enumerate(origin_list_labels):
+        if value == -1 or origin_dict_lables[value] < 20:
             continue
-        new_dataset.append(destination_dataSet[key])
-        new_labels.append(value)
-    new_dataset = np.array(new_dataset)
-    dict_lables = Counter(new_labels)
-    print(dict_lables)
+        origin_new_dataset.append(origin_dataset[key])
+        origin_new_labels.append(value)
+    origin_new_dataset = np.array(origin_new_dataset)
+    origin_dict_lables = Counter(origin_new_labels)
+    print(origin_dict_lables)
 
+    '''
+        destination points cluster
+    '''
+    destination_new_dataset = []
+    destination_new_labels = []
+    destination_list_labels = list(destination_labels)
+    destination_dict_lables = Counter(destination_list_labels)
+    for key, value in enumerate(destination_list_labels):
+        if value == -1 or destination_dict_lables[value] < 10:
+            continue
+        destination_new_dataset.append(destination_dataSet[key])
+        destination_new_labels.append(value)
+    destination_new_dataset = np.array(destination_new_dataset)
+    destination_dict_lables = Counter(destination_new_labels)
+    print(destination_dict_lables)
+    np.save("F:\FCD data\cluster\cluster_dataset", destination_new_dataset)
+    np.save("F:\FCD data\cluster\destination_labels", destination_new_labels)
 
 
     # single_class_dataset = []
@@ -83,10 +90,18 @@ def main():
 
     # Number of clusters in labels, ignoring noise if present.
     n_clusters_ = len(set(destination_labels)) - (1 if -1 in destination_labels else 0)
+    origin_n_clusters_ = len(set(origin_labels)) - (1 if -1 in origin_labels else 0)
 
-    print('Estimated number of clusters: %d' % n_clusters_)
+    print('Estimated number of destination clusters: %d' % n_clusters_)
+    print('Estimated number of origin clusters: %d' % origin_n_clusters_)
 
-    plt.scatter(new_dataset[:, 0], new_dataset[:, 1], c=new_labels, s=10, cmap='seismic')
+    plt.figure()
+    plt.scatter(origin_new_dataset[:, 0], origin_new_dataset[:, 1], c=origin_new_labels, s=10, cmap='seismic')
+    plt.title('origin cluster')
+    plt.figure()
+    plt.scatter(destination_new_dataset[:, 0], destination_new_dataset[:, 1], c=destination_new_labels, s=10, cmap='seismic')
+    plt.title('destination cluster')
+    plt.show()
     plt.show()
 
 

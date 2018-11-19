@@ -42,6 +42,8 @@ def get_weekday_trajectory(path):
     file_youke = file_youke_0
     count = 0
     for dictionary in dictionaries:
+        if os.path.isfile(dictionary):
+            continue
         files = os.listdir(path + "/" + dictionary)
         for filename in files:
             file = open(path + "/" + dictionary + "/" + filename)
@@ -57,9 +59,9 @@ def get_weekday_trajectory(path):
             item = []
             while line:
                 item = line.split(";")
-                mod = count % 10
+                mod = count % 3
                 if pre_point_status == item[4]:
-                    trajectory.append(item[1:4])
+                    trajectory.append(item[1:6])
                 else:
                     if item[4] == '1':
                         if mod == 0:
@@ -110,7 +112,7 @@ def get_weekday_trajectory(path):
                     count = count + 1
                     pre_point_status = item[4]
                     trajectory.clear()
-                    trajectory.append(item[1:4])
+                    trajectory.append(item[1:6])
 
                 line = file.readline().strip('\n')
 
@@ -168,7 +170,7 @@ def get_weekday_trajectory(path):
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    weekday_path = "F:\FCD data\\trajectory\workday"
+    weekday_path = "F:\FCD data\\trajectory_week_day"
     # weekend_path = "F:\FCD data\\trajectory\weekend"
     get_weekday_trajectory(weekday_path)
 
