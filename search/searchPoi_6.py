@@ -96,7 +96,7 @@ def main(argv=None):
     # saveToRedis()
     # print(getPOIofDistrict())
     pool = ThreadPoolExecutor(8)
-    for i in range(766, 800):
+    for i in range(799, 800):
         pool.submit(saveToRedis_1(i))
 
 

@@ -296,6 +296,7 @@ class BiLSTM_CRF(nn.Module):
 
 START_TAG = "<START>"
 STOP_TAG = "<STOP>"
+'''
 EMBEDDING_DIM = 5
 HIDDEN_DIM = 4
 
@@ -416,7 +417,7 @@ def main(argv=None):
 
 if __name__ == "__main__":
     sys.exit(main())
-
+'''
 ######################################################################
 # Exercise: A new loss function for discriminative tagging
 # --------------------------------------------------------
