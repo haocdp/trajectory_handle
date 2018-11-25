@@ -9,6 +9,8 @@ import torch.autograd as autograd
 import torch.nn as nn
 import torch.optim as optim
 from collections import Counter
+from graphviz import Digraph
+from visualize import make_dot
 
 START_TAG = "<START>"
 STOP_TAG = "<STOP>"
@@ -88,9 +90,12 @@ def main(argv=None):
 
     # Check predictions before training
     with torch.no_grad():
-        precheck_sent = prepare_sequence(test_data[0][0], word_to_ix)
-        precheck_tags = torch.tensor([tag_to_ix[t] for t in test_data[0][1]], dtype=torch.long)
-        print(model(precheck_sent))
+        precheck_sent = prepare_sequence(test_data[2][0], word_to_ix)
+        precheck_tags = torch.tensor([tag_to_ix[t] for t in test_data[2][1]], dtype=torch.long)
+
+        y = model(precheck_sent)
+        print(y)
+        make_dot(y)
         print(precheck_tags)
 
 

@@ -3,7 +3,10 @@ import numpy as np
 import sys
 import math
 from ast import literal_eval
-
+"""
+加载轨迹数据，并判断每个轨迹点所属的类簇
+抽取观测序列和类簇序列
+"""
 # 加载聚类数据
 def init():
     cluster_dataset = list(np.load("F:\FCD data\cluster\cluster_dataset.npy"))

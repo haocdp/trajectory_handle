@@ -13,8 +13,8 @@ from collections import Counter
 
 START_TAG = "<START>"
 STOP_TAG = "<STOP>"
-EMBEDDING_DIM = 5
-HIDDEN_DIM = 4
+EMBEDDING_DIM = 10
+HIDDEN_DIM = 20
 torch.manual_seed(1)
 
 
@@ -121,7 +121,7 @@ def main(argv=None):
             count = count + 1
             print(float(count / all_count))
 
-    torch.save(model, "prediction_model.pkl")
+    torch.save(model, "prediction_model_embeddingDim10_hiddenDim20.pkl")
 
     # Check predictions after training
     with torch.no_grad():
