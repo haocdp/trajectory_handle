@@ -67,12 +67,18 @@ def classify_point(filepath, result_filepath):
             for point in trajectory:
                 point.append(poi_dict[int(point[-1])] if int(point[-1]) in poi_dict.keys() else -1)
 
-            cluster_class = get_cluster_num(cluster_dict, list(map(float, trajectory[-1][0:2])))
+            cluster_class = get_cluster_num(cluster_dict, list(map(float, trajectory[-1][1:3])))
             trajectory_destination = (trajectory, cluster_class)
             trajectories.append(trajectory_destination)
             result.write(str(trajectory) + ";" + str(cluster_class) + '\n')
     result.close()
-    np.load("F:\FCD data\\trajectory\workday_trajectory_destination\\youke_1_result_npy", trajectories)
+    np.save("F:\FCD data\\trajectory\workday_trajectory_destination\\youke_1_result_npy", trajectories)
+
+
+def run():
+    filepath = "F:\FCD data\\trajectory\workday_trajectory_destination\\youke_1"
+    result_filepath = "F:\FCD data\\trajectory\workday_trajectory_destination\\youke_1_result"
+    classify_point(filepath, result_filepath)
 
 
 def main(argv=None):

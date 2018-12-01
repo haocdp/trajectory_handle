@@ -59,7 +59,7 @@ def get_weekday_trajectory(path):
                 item = line.split(";")
                 mod = count % 3
                 if pre_point_status == item[4]:
-                    trajectory.append(item[1:6])
+                    trajectory.append(item[0:6])
                 else:
                     if item[4] == '1':
                         if mod == 0:
@@ -110,7 +110,7 @@ def get_weekday_trajectory(path):
                     count = count + 1
                     pre_point_status = item[4]
                     trajectory.clear()
-                    trajectory.append(item[1:6])
+                    trajectory.append(item[0:6])
 
                 line = file.readline().strip('\n')
 
@@ -163,6 +163,12 @@ def get_weekday_trajectory(path):
     file_xunke_7.close()
     file_xunke_8.close()
     file_xunke_9.close()
+
+
+def run():
+    weekday_path = "F:\FCD data\\trajectory_week_day\\weekday"
+    # weekend_path = "F:\FCD data\\trajectory\weekend"
+    get_weekday_trajectory(weekday_path)
 
 
 def main(argv=None):

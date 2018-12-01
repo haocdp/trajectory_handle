@@ -18,7 +18,7 @@ EMBEDDING_DIM = 5
 HIDDEN_DIM = 4
 torch.manual_seed(1)
 
-
+""" 将观测序列中连续相同的区域删除，只保留不同区域之间的转换 """
 def validate_trajectory(clusters, regions):
     first_index = 0
     last_index = 0

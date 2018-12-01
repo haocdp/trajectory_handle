@@ -37,6 +37,10 @@ def get_representative_poi(input_path, output_path):
     np.save("F:\FCD data\shenzhen_map_poi\\taz_region_poi\poi_dict", poi_dict)
 
 
+def run():
+    get_representative_poi("F:\FCD data\shenzhen_map_poi", "F:\FCD data\shenzhen_map_poi\\taz_region_poi")
+
+
 def main(argv=None):
     if argv is None:
         argv = sys.argv
