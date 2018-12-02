@@ -57,7 +57,7 @@ def classify_point(filepath, result_filepath):
 
     trajectories = []
     result = open(result_filepath, 'w')
-    with open(filepath) as fr:
+    with open(filepath, 'r', encoding="utf-8") as fr:
         for line in fr.readlines():
             if line == '' or line == '\n':
                 continue
