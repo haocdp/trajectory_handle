@@ -11,8 +11,8 @@ from ast import literal_eval
 
 # 加载聚类数据
 def init():
-    cluster_dataset = list(np.load("F:\FCD data\cluster\cluster_dataset.npy"))
-    labels = list(np.load("F:\FCD data\cluster\destination_labels.npy"))
+    cluster_dataset = list(np.load("/root/data/cluster/cluster_dataset.npy"))
+    labels = list(np.load("/root/data/cluster/destination_labels.npy"))
     cluster_dict = {}
     for index, value in enumerate(labels):
         if value == -1:
@@ -28,7 +28,7 @@ def init():
 
 # 加载区域POI数据
 def init_district_poi():
-    poi_dict = np.load("F:\FCD data\shenzhen_map_poi\\taz_region_poi\poi_dict.npy").item()
+    poi_dict = np.load("/root/data/shenzhen_map_poi/taz_region_poi/poi_dict.npy").item()
     return poi_dict
 
 
@@ -72,20 +72,20 @@ def classify_point(filepath, result_filepath):
             trajectories.append(trajectory_destination)
             result.write(str(trajectory) + ";" + str(cluster_class) + '\n')
     result.close()
-    np.save("F:\FCD data\\trajectory\workday_trajectory_destination\\youke_1_result_npy", trajectories)
+    np.save("/root/data/trajectory/workday_trajectory_destination/youke_0_result_npy", trajectories)
 
 
 def run():
-    filepath = "F:\FCD data\\trajectory\workday_trajectory_destination\\youke_1"
-    result_filepath = "F:\FCD data\\trajectory\workday_trajectory_destination\\youke_1_result"
+    filepath = "/root/data/trajectory/workday_trajectory_destination/youke_0"
+    result_filepath = "/root/data/trajectory/workday_trajectory_destination/youke_0_result"
     classify_point(filepath, result_filepath)
 
 
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    filepath = "F:\FCD data\\trajectory\workday_trajectory_destination\\youke_1"
-    result_filepath = "F:\FCD data\\trajectory\workday_trajectory_destination\\youke_1_result"
+    filepath = "/root/data/trajectory/workday_trajectory_destination/youke_0"
+    result_filepath = "/root/data/trajectory/workday_trajectory_destination/youke_0_result"
     classify_point(filepath, result_filepath)
 
 
