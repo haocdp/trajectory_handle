@@ -26,6 +26,7 @@ EPOCH = 10  # train the training data n times, to save time, we just train 1 epo
 BATCH_SIZE = 64
 TIME_STEP = 10  # rnn time step / image height
 INPUT_SIZE = 30  # rnn input size / image width
+HIDDEN_SIZE = 256
 LR = 0.01  # learning rate
 
 labels = list(np.load("/root/data/cluster/destination_labels.npy"))
@@ -115,12 +116,12 @@ class RNN(nn.Module):
 
         self.rnn = nn.LSTM(  # if use nn.RNN(), it hardly learns
             input_size=INPUT_SIZE,
-            hidden_size=128,  # rnn hidden unit
+            hidden_size=HIDDEN_SIZE,  # rnn hidden unit
             num_layers=2,  # number of rnn layer
             batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
 
-        self.out = nn.Linear(128, label_size)
+        self.out = nn.Linear(HIDDEN_SIZE, label_size)
         self.car_embeds = nn.Embedding(len(car_to_ix), 10)
         self.poi_embeds = nn.Embedding(len(poi_to_ix), 10)
         self.region_embeds = nn.Embedding(1067, 10)
