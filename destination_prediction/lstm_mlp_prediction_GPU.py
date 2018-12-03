@@ -4,7 +4,8 @@ import numpy as np
 import torch.utils.data as Data
 import torch.nn.functional as F
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
+gpu_avaliable = torch.cuda.is_available()
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 64
 TIME_STEP = 10  # rnn time step / image height
@@ -12,13 +13,13 @@ INPUT_SIZE = 30  # rnn input size / image width
 HIDDEN_SIZE = 128
 LR = 0.01  # learning rate
 
-labels = list(np.load("F:\FCD data\cluster\destination_labels.npy"))
+labels = list(np.load("/root/data/cluster/destination_labels.npy"))
 # label个数
 label_size = len(set(labels))
 
 
 def load_data():
-    filepath = "F:\FCD data\\trajectory\workday_trajectory_destination\youke_1_result_npy.npy"
+    filepath = "/root/data/trajectory/workday_trajectory_destination/youke_1_result_npy.npy"
     trajectories = list(np.load(filepath))
     count = len(trajectories) * 0.8
 
@@ -80,8 +81,8 @@ def load_data():
 train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix = load_data()
 train_data = torch.FloatTensor(train_data)
 train_labels = torch.LongTensor(train_labels)
-test_data = torch.FloatTensor(test_data)
-test_labels = torch.LongTensor(test_labels).numpy()
+test_data = torch.FloatTensor(test_data).cuda() if gpu_avaliable else torch.FloatTensor(test_data)
+test_labels = torch.LongTensor(test_labels).cuda() if gpu_avaliable else torch.LongTensor(test_labels)
 
 torch_dataset = Data.TensorDataset(train_data, train_labels)
 loader = Data.DataLoader(
@@ -109,18 +110,20 @@ class EncoderRNN(nn.Module):
 
     def forward(self, x, hidden):
         new_vector = None
-        new_vector = torch.cat((self.car_embeds(torch.LongTensor([x[0].item()]))[0],
-                                self.region_embeds(torch.LongTensor([x[1].item()]))[0]))
-        new_vector = torch.cat((new_vector, self.poi_embeds(torch.LongTensor([x[2].item()]))[0]))
+        new_vector = torch.cat((self.car_embeds(torch.cuda.LongTensor([x[0].item()]))[0],
+                                self.region_embeds(torch.cuda.LongTensor([x[1].item()]))[0]))
+        new_vector = torch.cat((new_vector, self.poi_embeds(torch.cuda.LongTensor([x[2].item()]))[0]))
         x = new_vector.view(1, 1, 30)
 
         # embedded = self.embedding(input).view(1, 1, -1)
+        if gpu_avaliable:
+            x = x.cuda()
         output = x
         output, hidden = self.lstm(output, hidden)
         return output, hidden
 
     def initHidden(self):
-        return torch.zeros(1, 1, self.hidden_size, device=device)
+        return torch.zeros(1, 1, self.hidden_size)
 
 
 class MLP(nn.Module):
@@ -135,6 +138,8 @@ class MLP(nn.Module):
     def forward(self, x):
         # convert tensor (128, 1, 28, 28) --> (128, 1*28*28)
         x = x.view(-1)
+        if gpu_avaliable:
+            x = x.cuda()
         x = self.layers(x)
         return x
 
@@ -143,6 +148,9 @@ encoder = EncoderRNN(INPUT_SIZE, HIDDEN_SIZE)
 print(encoder)
 mlp = MLP()
 print(mlp)
+if gpu_avaliable:
+    encoder.cuda()
+    mlp.cuda()
 
 encoder_optimizer = torch.optim.Adam(encoder.parameters(), lr=LR)
 mlp_optimizer = torch.optim.Adam(mlp.parameters(), lr=LR)
@@ -169,6 +177,9 @@ def train(b_x):
 for epoch in range(EPOCH):
     for step, (b_x, b_y) in enumerate(loader):  # gives batch data
         b_x = b_x.view(-1, 10, 3)  # reshape x to (batch, time_step, input_size)
+        if gpu_avaliable:
+            b_x = b_x.cuda()
+            b_y = b_y.cuda()
 
         output = train(b_x)
         loss = loss_func(output, b_y)  # cross entropy loss
@@ -180,12 +191,18 @@ for epoch in range(EPOCH):
 
         if step % 50 == 0:
             test_output = train(test_data)  # (samples, time_step, input_size)
-            pred_y = torch.max(test_output, 1)[1].data.numpy()
-            accuracy = float((pred_y == test_labels).astype(int).sum()) / float(test_labels.size)
+            if gpu_avaliable:
+                pred_y = torch.max(test_output, 1)[1].cuda().data
+            else:
+                pred_y = torch.max(test_output, 1)[1].data.numpy()
+                accuracy = torch.sum(pred_y == test_labels).type(torch.FloatTensor) / test_labels.size(0)
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.2f' % accuracy)
 
 # print 10 predictions from test data
 test_output = train(test_data[:10].view(-1, 10, 3))
-pred_y = torch.max(test_output, 1)[1].data.numpy()
+if gpu_avaliable:
+    pred_y = torch.max(test_output, 1)[1].cuda().data
+else:
+    pred_y = torch.max(test_output, 1)[1].data.numpy()
 print(pred_y, 'prediction number')
 print(test_labels[:10], 'real number')
