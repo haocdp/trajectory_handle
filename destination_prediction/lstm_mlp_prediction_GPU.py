@@ -3,6 +3,7 @@ from torch import nn
 import numpy as np
 import torch.utils.data as Data
 import torch.nn.functional as F
+import os
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
 gpu_avaliable = torch.cuda.is_available()
