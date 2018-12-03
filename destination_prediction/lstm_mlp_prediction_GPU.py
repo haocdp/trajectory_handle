@@ -197,7 +197,7 @@ for epoch in range(EPOCH):
                 pred_y = torch.max(test_output, 1)[1].cuda().data
             else:
                 pred_y = torch.max(test_output, 1)[1].data.numpy()
-                accuracy = torch.sum(pred_y == test_labels).type(torch.FloatTensor) / test_labels.size(0)
+            accuracy = torch.sum(pred_y == test_labels).type(torch.FloatTensor) / test_labels.size(0)
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
 
 # print 10 predictions from test data
