@@ -198,7 +198,7 @@ for epoch in range(EPOCH):
             else:
                 pred_y = torch.max(test_output, 1)[1].data.numpy()
                 accuracy = torch.sum(pred_y == test_labels).type(torch.FloatTensor) / test_labels.size(0)
-            print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.numpy(), '| test accuracy: %.2f' % accuracy)
+            print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
 
 # print 10 predictions from test data
 test_output = train(test_data[:10].view(-1, 10, 3))
