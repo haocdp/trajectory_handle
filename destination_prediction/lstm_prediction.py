@@ -18,7 +18,7 @@ import torch.utils.data as Data
 import torch.nn.functional as F
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "4"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
