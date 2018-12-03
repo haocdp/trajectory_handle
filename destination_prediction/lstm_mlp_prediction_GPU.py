@@ -119,6 +119,7 @@ class EncoderRNN(nn.Module):
         # embedded = self.embedding(input).view(1, 1, -1)
         if gpu_avaliable:
             x = x.cuda()
+            hidden = hidden.cuda()
         output = x
         output, hidden = self.lstm(output, hidden)
         return output, hidden
