@@ -23,7 +23,7 @@ gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
-BATCH_SIZE = 64
+BATCH_SIZE = 32
 TIME_STEP = 10  # rnn time step / image height
 INPUT_SIZE = 30  # rnn input size / image width
 HIDDEN_SIZE = 512
@@ -176,6 +176,7 @@ for epoch in range(EPOCH):
         optimizer.zero_grad()  # clear gradients for this training step
         loss.backward()  # backpropagation, compute gradients
         optimizer.step()  # apply gradients
+        del b_x, b_y
 
         if step % 50 == 0:
             test_output = rnn(test_data)  # (samples, time_step, input_size)
