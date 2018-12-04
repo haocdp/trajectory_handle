@@ -26,7 +26,7 @@ EPOCH = 10  # train the training data n times, to save time, we just train 1 epo
 BATCH_SIZE = 32
 TIME_STEP = 10  # rnn time step / image height
 INPUT_SIZE = 30  # rnn input size / image width
-HIDDEN_SIZE = 512
+HIDDEN_SIZE = 256
 LR = 0.01  # learning rate
 
 labels = list(np.load("/root/data/cluster/destination_labels.npy"))
