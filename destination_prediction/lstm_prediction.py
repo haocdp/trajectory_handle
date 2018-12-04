@@ -149,7 +149,7 @@ class RNN(nn.Module):
 
         # choose r_out at the last time step
         out = self.out(r_out[:, -1, :])
-        del r_out, h_c, h_n
+        del x, r_out, h_c, h_n
         # out = F.softmax(out, 1)
         return out
 
