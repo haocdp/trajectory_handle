@@ -28,6 +28,7 @@ TIME_STEP = 10  # rnn time step / image height
 INPUT_SIZE = 30  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.01  # learning rate
+LAYER_NUM = 4
 
 labels = list(np.load("/root/data/cluster/destination_labels.npy"))
 # label个数
@@ -117,7 +118,7 @@ class RNN(nn.Module):
         self.rnn = nn.LSTM(  # if use nn.RNN(), it hardly learns
             input_size=INPUT_SIZE,
             hidden_size=HIDDEN_SIZE,  # rnn hidden unit
-            num_layers=2,  # number of rnn layer
+            num_layers=LAYER_NUM,  # number of rnn layer
             batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
 
