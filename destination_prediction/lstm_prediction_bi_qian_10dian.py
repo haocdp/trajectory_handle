@@ -22,9 +22,8 @@ EPOCH = 10  # train the training data n times, to save time, we just train 1 epo
 BATCH_SIZE = 64
 TIME_STEP = 10  # rnn time step / image height
 INPUT_SIZE = 30  # rnn input size / image width
-HIDDEN_SIZE = 128
+HIDDEN_SIZE = 256
 LR = 0.01  # learning rate
-LAYER_NUM = 1
 
 labels = list(np.load("F:\FCD data\cluster\destination_labels.npy"))
 # label个数
@@ -83,10 +82,10 @@ def load_data():
             c += 1
             continue
         if c < count:
-            train_data.append(new_tra[:5] + new_tra[-5:])
+            train_data.append(new_tra[:10])
             train_labels.append(label)
         else:
-            test_data.append(new_tra[:5] + new_tra[-5:])
+            test_data.append(new_tra[:10])
             test_labels.append(label)
         c += 1
     return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix
