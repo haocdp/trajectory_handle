@@ -88,7 +88,7 @@ def load_data():
             train_data.append(new_tra[:10])
             train_labels.append(label)
         else:
-            test_data.append(new_tra[:5])
+            test_data.append(new_tra[:10])
             test_labels.append(label)
         c += 1
     return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix
