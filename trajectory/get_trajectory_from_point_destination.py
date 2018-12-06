@@ -11,36 +11,36 @@ import os
 
 
 def get_weekday_trajectory(path):
-    save_path = "F:\FCD data\\trajectory\workday_trajectory_destination"
+    save_path = "F:/FCD data/trajectory/allday"
 
-    file_youke_0 = open(save_path + "\youke_0", "w")
-    file_youke_1 = open(save_path + "\youke_1", "w")
-    file_youke_2 = open(save_path + "\youke_2", "w")
-    file_youke_3 = open(save_path + "\youke_3", "w")
-    file_youke_4 = open(save_path + "\youke_4", "w")
-    file_youke_5 = open(save_path + "\youke_5", "w")
-    file_youke_6 = open(save_path + "\youke_6", "w")
-    file_youke_7 = open(save_path + "\youke_7", "w")
-    file_youke_8 = open(save_path + "\youke_8", "w")
-    file_youke_9 = open(save_path + "\youke_9", "w")
+    file_youke_0 = open(save_path + "/youke_0", "w")
+    file_youke_1 = open(save_path + "/youke_1", "w")
+    file_youke_2 = open(save_path + "/youke_2", "w")
+    file_youke_3 = open(save_path + "/youke_3", "w")
+    file_youke_4 = open(save_path + "/youke_4", "w")
+    file_youke_5 = open(save_path + "/youke_5", "w")
+    file_youke_6 = open(save_path + "/youke_6", "w")
+    file_youke_7 = open(save_path + "/youke_7", "w")
+    file_youke_8 = open(save_path + "/youke_8", "w")
+    file_youke_9 = open(save_path + "/youke_9", "w")
 
-    file_xunke_0 = open(save_path + "\\xunke_0", "w")
-    file_xunke_1 = open(save_path + "\\xunke_1", "w")
-    file_xunke_2 = open(save_path + "\\xunke_2", "w")
-    file_xunke_3 = open(save_path + "\\xunke_3", "w")
-    file_xunke_4 = open(save_path + "\\xunke_4", "w")
-    file_xunke_5 = open(save_path + "\\xunke_5", "w")
-    file_xunke_6 = open(save_path + "\\xunke_6", "w")
-    file_xunke_7 = open(save_path + "\\xunke_7", "w")
-    file_xunke_8 = open(save_path + "\\xunke_8", "w")
-    file_xunke_9 = open(save_path + "\\xunke_9", "w")
+    file_xunke_0 = open(save_path + "/xunke_0", "w")
+    file_xunke_1 = open(save_path + "/xunke_1", "w")
+    file_xunke_2 = open(save_path + "/xunke_2", "w")
+    file_xunke_3 = open(save_path + "/xunke_3", "w")
+    file_xunke_4 = open(save_path + "/xunke_4", "w")
+    file_xunke_5 = open(save_path + "/xunke_5", "w")
+    file_xunke_6 = open(save_path + "/xunke_6", "w")
+    file_xunke_7 = open(save_path + "/xunke_7", "w")
+    file_xunke_8 = open(save_path + "/xunke_8", "w")
+    file_xunke_9 = open(save_path + "/xunke_9", "w")
 
     dictionaries = os.listdir(path)
     file_xunke = file_xunke_0
     file_youke = file_youke_0
     count = 0
     for dictionary in dictionaries:
-        if os.path.isfile(dictionary):
+        if os.path.isfile(path + "/" + dictionary):
             continue
         files = os.listdir(path + "/" + dictionary)
         for filename in files:
@@ -166,7 +166,7 @@ def get_weekday_trajectory(path):
 
 
 def run():
-    weekday_path = "F:\FCD data\\trajectory_week_day\\weekday"
+    weekday_path = "F:\FCD data\\trajectory_week_day"
     # weekend_path = "F:\FCD data\\trajectory\weekend"
     get_weekday_trajectory(weekday_path)
 
@@ -174,7 +174,7 @@ def run():
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    weekday_path = "F:\FCD data\\trajectory_week_day\\weekday"
+    weekday_path = "F:\FCD data\\trajectory_week_day"
     # weekend_path = "F:\FCD data\\trajectory\weekend"
     get_weekday_trajectory(weekday_path)
 

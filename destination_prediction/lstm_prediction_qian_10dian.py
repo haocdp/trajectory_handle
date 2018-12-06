@@ -28,7 +28,7 @@ TIME_STEP = 10  # rnn time step / image height
 INPUT_SIZE = 30  # rnn input size / image width
 HIDDEN_SIZE = 128
 LR = 0.01  # learning rate
-LAYER_NUM = 4
+LAYER_NUM = 2
 
 labels = list(np.load("/root/data/cluster/destination_labels.npy"))
 # label个数
