@@ -80,22 +80,22 @@ def classify_point(filepath, result_filepath):
             cluster_class = get_cluster_num(cluster_dict, list(map(float, trajectory[-1][1:3])))
             trajectory_destination = (trajectory, cluster_class, week_day, timeslot)
             trajectories.append(trajectory_destination)
-            result.write(str(trajectory) + ";" + str(cluster_class) + ";" + str(week_day) + ";" + str(timeslot) + '\n')
+            result.write(str(trajectory) + ";" + str(cluster_class) + '\n')
     result.close()
-    np.save("F:\FCD data/trajectory/allday/youke_0_result_npy", trajectories)
+    np.save("F:\FCD data/trajectory/allday/youke_2_result_npy", trajectories)
 
 
 def run():
-    filepath = "F:\FCD data/trajectory/allday/youke_0"
-    result_filepath = "F:\FCD data/trajectory/allday/youke_0_result"
+    filepath = "F:\FCD data/trajectory/allday/youke_2"
+    result_filepath = "F:\FCD data/trajectory/allday/youke_2_result"
     classify_point(filepath, result_filepath)
 
 
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    filepath = "F:\FCD data/trajectory/allday/youke_0"
-    result_filepath = "F:\FCD data/trajectory/allday/youke_0_result"
+    filepath = "F:\FCD data/trajectory/allday/youke_2"
+    result_filepath = "F:\FCD data/trajectory/allday/youke_2_result"
     classify_point(filepath, result_filepath)
 
 

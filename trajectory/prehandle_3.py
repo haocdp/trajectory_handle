@@ -185,7 +185,7 @@ def main(argv=None):
         argv = sys.argv
 
     # batch_handle("F:/FCD data/FCD-7月")
-    divide_trajectory_by_car("F:/FCD data/FCD-7月/2011-7-18log_1.txt", "2011-7-18log_1.txt")
+    divide_trajectory_by_car("F:/FCD data/FCD-7月/2011-7-25log_1.txt", "2011-7-25log_1.txt")
     # divide_trajectory_by_car("F:/FCD data/新建文本文档.txt", "新建文本文档.txt")
 
 
