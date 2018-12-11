@@ -1,6 +1,7 @@
 # ！/usr/bin/env python3
 import sys
 sys.path.append("/root/trajectory_handle/")
+sys.setdefaultencoding('utf-8')
 
 from concurrent.futures import ThreadPoolExecutor
 import os
@@ -40,7 +41,6 @@ def divide_trajectory_by_car(file_path, file_name):
     count = 0
 
     for file in files:
-
         file = open(file_path + '/' + file, 'r')
         lines = file.readlines()
         for line in lines:
