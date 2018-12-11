@@ -1,5 +1,8 @@
 # ！/usr/bin/env python3
 import sys
+sys.path.append("/root/trajectory_handle/")
+
+
 from concurrent.futures import ThreadPoolExecutor
 import os
 import datetime
