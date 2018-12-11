@@ -1,7 +1,8 @@
 # ！/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import sys
 sys.path.append("/root/trajectory_handle/")
-sys.setdefaultencoding('utf-8')
 
 from concurrent.futures import ThreadPoolExecutor
 import os
