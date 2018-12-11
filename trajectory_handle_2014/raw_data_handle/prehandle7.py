@@ -1,5 +1,7 @@
 # ！/usr/bin/env python3
 import sys
+sys.path.append("/root/trajectory_handle/")
+
 from concurrent.futures import ThreadPoolExecutor
 import os
 import datetime
@@ -9,6 +11,10 @@ from shenzhen_map.save_region import is_point_in_polygon
 import json
 import time
 import numpy as np
+
+linux_path = "/root"
+windows_path = "F:"
+base_path = linux_path
 
 
 # 从redis中读取城市区域划分
@@ -57,13 +63,13 @@ def divide_trajectory_by_car(file_path, file_name):
     # 线程池
     pool = ThreadPoolExecutor(4)
 
-    dic_path = "F:/taxiData/divide_by_taxi/" + file_name
+    dic_path = base_path + "/taxiData/divide_by_taxi/" + file_name
     if not os.path.exists(dic_path):
         os.mkdir(dic_path)
     for key in plate_number_dict.keys():
         pool.submit(write_file, key, plate_number_dict, dic_path)
 
-    np.save("F:/taxiData/divide_by_taxi/car_trajectory" + "_" + file_name, plate_number_dict)
+    np.save(base_path + "/taxiData/divide_by_taxi/car_trajectory" + "_" + file_name, plate_number_dict)
     # print(plateNumber_dict)
     file.close()
 
@@ -191,7 +197,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    divide_trajectory_by_car("F:/TaxiData/rawData/26", "2014-10-26")
+    divide_trajectory_by_car(base_path + "/TaxiData/rawData/26", "2014-10-26")
 
 
 if __name__ == "__main__":

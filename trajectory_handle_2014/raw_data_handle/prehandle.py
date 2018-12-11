@@ -14,6 +14,11 @@ import time
 import numpy as np
 
 
+linux_path = "/root"
+windows_path = "F:"
+base_path = linux_path
+
+
 # 从redis中读取城市区域划分
 def get_region():
     r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
@@ -60,13 +65,13 @@ def divide_trajectory_by_car(file_path, file_name):
     # 线程池
     pool = ThreadPoolExecutor(4)
 
-    dic_path = "F:/taxiData/divide_by_taxi/" + file_name
+    dic_path = base_path + "/taxiData/divide_by_taxi/" + file_name
     if not os.path.exists(dic_path):
         os.mkdir(dic_path)
     for key in plate_number_dict.keys():
         pool.submit(write_file, key, plate_number_dict, dic_path)
 
-    np.save("F:/taxiData/divide_by_taxi/car_trajectory" + "_" + file_name, plate_number_dict)
+    np.save(base_path + "/taxiData/divide_by_taxi/car_trajectory" + "_" + file_name, plate_number_dict)
     # print(plateNumber_dict)
     file.close()
 
@@ -194,7 +199,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    divide_trajectory_by_car("F:/TaxiData/rawData/20", "2014-10-20")
+    divide_trajectory_by_car(base_path + "/TaxiData/rawData/20", "2014-10-20")
 
 
 if __name__ == "__main__":
