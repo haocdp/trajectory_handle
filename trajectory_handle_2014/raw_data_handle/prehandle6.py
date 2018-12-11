@@ -197,7 +197,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    divide_trajectory_by_car(base_path + "/TaxiData/rawData/25", "2014-10-25")
+    divide_trajectory_by_car(base_path + "/taxiData/rawData/25", "2014-10-25")
 
 
 if __name__ == "__main__":
