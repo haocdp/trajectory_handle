@@ -3,8 +3,6 @@
 
 import sys
 sys.path.append("/root/trajectory_handle/")
-reload(sys) # Python2.5 初始化后会删除 sys.setdefaultencoding 这个方法，我们需要重新载入
-sys.setdefaultencoding('utf-8')
 
 from concurrent.futures import ThreadPoolExecutor
 import os
@@ -46,7 +44,7 @@ def divide_trajectory_by_car(file_path, file_name):
 
     for file in files:
 
-        file = open(file_path + '/' + file, 'r')
+        file = open(file_path + '/' + file, 'r', encoding="utf-8")
         lines = file.readlines()
         for line in lines:
             # start_time = time.time()
