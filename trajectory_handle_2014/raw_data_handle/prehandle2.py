@@ -42,7 +42,7 @@ def divide_trajectory_by_car(file_path, file_name):
 
     for file in files:
 
-        file = open(file_path + '/' + file, 'r')
+        file = open(file_path + '/' + file, 'r', encoding='gbk')
         lines = file.readlines()
         for line in lines:
             # start_time = time.time()
