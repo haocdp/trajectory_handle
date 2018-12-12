@@ -9,7 +9,7 @@ linux_path = "/root/data"
 windows_path = "F:/FCD data"
 
 r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
-path = windows_path + "/shenzhen_map/taz.txt"
+path = linux_path + "/shenzhen_map/taz.txt"
 taz_file = open(path, "w")
 
 
