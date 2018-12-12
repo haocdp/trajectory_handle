@@ -14,7 +14,7 @@ import numpy as np
 
 linux_path = "/root"
 windows_path = "F:"
-base_path = windows_path
+base_path = linux_path
 
 
 # 从redis中读取城市区域划分
@@ -41,7 +41,7 @@ def divide_trajectory_by_car(file_path, file_name):
 
     for file in files:
 
-        file = open(file_path + '/' + file, 'r')
+        file = open(file_path + '/' + file, 'r', encoding='gbk')
         lines = file.readlines()
         for line in lines:
             # start_time = time.time()
