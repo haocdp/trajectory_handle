@@ -16,7 +16,7 @@ import numpy as np
 
 linux_path = "/root"
 windows_path = "F:"
-base_path = linux_path
+base_path = windows_path
 
 
 # 从redis中读取城市区域划分
