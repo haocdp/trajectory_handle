@@ -1,4 +1,6 @@
 # ！/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import sys
 sys.path.append("/root/trajectory_handle/")
 
@@ -7,10 +9,11 @@ import os
 import datetime
 from trajectory.cal_distance import haversine
 import redis
-from shenzhen_map.save_region import is_point_in_polygon
+from shenzhen_map.save_region_grid import is_point_in_polygon
 import json
 import time
 import numpy as np
+
 
 linux_path = "/root"
 windows_path = "F:"
@@ -21,10 +24,10 @@ base_path = linux_path
 def get_region():
     r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
     taz_dict = {}
-    for i in range(1, 1068):
-        taz_id = "taz_" + str(i)
+    for i in range(0, 918):
+        taz_id = "taz_grid_" + str(i)
         polygon = str(r.get(taz_id), 'utf-8')
-        taz_dict[taz_id] = list(json.loads(polygon))
+        taz_dict[taz_id] = list(map(float, polygon.split(';')))
     return taz_dict
 
 
@@ -41,10 +44,10 @@ def divide_trajectory_by_car(file_path, file_name):
 
     for file in files:
 
-        file = open(file_path + '/' + file, 'r', encoding='gbk')
+        start_time = time.time()
+        file = open(file_path + '/' + file, 'r', encoding="gbk")
         lines = file.readlines()
         for line in lines:
-            # start_time = time.time()
             new_line, plate_number = simplify_line(line)
             if not new_line == '':
                 if plate_number in plate_number_dict.keys():
@@ -54,10 +57,12 @@ def divide_trajectory_by_car(file_path, file_name):
                     plate_number_dict[plate_number].append(new_line)
 
             # print(line)
-            # end_time = time.time()
-            # print(end_time - start_time)
+
+        end_time = time.time()
+        print("cost time: {}".format(end_time - start_time))
+
         count += 1
-        print(float(count) / all_count)
+        print("cal percent: {}".format(float(count) / all_count))
 
     filter_trajectory_point(plate_number_dict)
     # 线程池
@@ -95,8 +100,8 @@ def filter_trajectory_point(dict):
         for point in points:
             items = point.split(';')
             # if float(items[1]) > 114.627314 or float(items[1]) < 113.756360 \
-                    # or float(items[2]) < 22.448471 or float(items[2]) > 22.856739:
-                # continue
+            # or float(items[2]) < 22.448471 or float(items[2]) > 22.856739:
+            # continue
             if pre_time == '' or pre_longitude == 0 or pre_latitude == 0:
                 pre_time = items[3]
                 pre_longitude = float(items[1])
