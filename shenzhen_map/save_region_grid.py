@@ -5,11 +5,12 @@ import redis
 
 # 读取深圳市网格划分gson文件，然后储存到redis中，并存储本地文件中
 
-linux_path = "/root/data"
+linux_path = "/root/taxiData"
 windows_path = "F:/TaxiData"
+base_path = linux_path
 
 r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
-path = windows_path + "/shenzhen_map/taz.txt"
+path = base_path + "/shenzhen_map/taz.txt"
 taz_file = open(path, "w")
 
 
@@ -56,7 +57,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    file_path = windows_path + "/shenzhen_map/TAZ_Grid_JSON.geojson"
+    file_path = base_path + "/shenzhen_map/TAZ_Grid_JSON.geojson"
     handle_file(file_path)
     # print(is_point_in_polygon([22.704432, 114.006278], [[22.707596, 113.884718],[22.682573, 113.891597],[22.667053, 113.895037],
     #                                       [22.665795, 113.937948], [22.683216, 113.973996],[22.708242, 113.961295],
