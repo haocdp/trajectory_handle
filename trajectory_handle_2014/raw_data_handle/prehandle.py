@@ -65,14 +65,12 @@ def divide_trajectory_by_car(file_path, file_name):
         print("cal percent: {}".format(float(count) / all_count))
 
     filter_trajectory_point(plate_number_dict)
-    # 线程池
-    pool = ThreadPoolExecutor(4)
 
     dic_path = base_path + "/taxiData/divide_by_taxi/" + file_name
     if not os.path.exists(dic_path):
         os.mkdir(dic_path)
     for key in plate_number_dict.keys():
-        pool.submit(write_file, key, plate_number_dict, dic_path)
+        write_file(key, plate_number_dict, dic_path)
 
     np.save(base_path + "/taxiData/divide_by_taxi/car_trajectory" + "_" + file_name, plate_number_dict)
     # print(plateNumber_dict)
