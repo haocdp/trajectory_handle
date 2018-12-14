@@ -137,7 +137,7 @@ def write_file(key, plateNumber_dict, path):
 
     file = open(path + "/" + key + ".txt", 'w')
     for line in plateNumber_dict.get(key):
-        file.write(line.encode('utf-8'))
+        file.write(line.encode('gbk'))
     file.close()
 
 
