@@ -135,9 +135,9 @@ def write_file(key, plateNumber_dict, path):
     if key == '\n' or key is '\n':
         return
 
-    file = open(path + "/" + key + ".txt", 'w', encoding='utf-8')
+    file = open(path + "/" + key + ".txt", 'w')
     for line in plateNumber_dict.get(key):
-        file.write(line.encode('utf-8'))
+        file.write(line)
     file.close()
 
 
@@ -161,7 +161,7 @@ def simplify_line(line):
     records = line.split(",")
     if not len(records) == 10 or not records[0] == '20141020':
         return '', ''
-    plate_no = records[3]
+    plate_no = records[3][-6:]
     date = records[0][0:4] + '-' + records[0][4:6] + '-' + records[0][6:8]
     time = records[1].zfill(6)
     time = time[0:2] + ':' + time[2:4] + ':' + time[4:6]
