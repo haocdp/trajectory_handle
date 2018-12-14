@@ -3,13 +3,14 @@
 
 import sys
 from urllib import request
+import urllib3
 import json
 import math
 import redis
 from concurrent.futures import ThreadPoolExecutor
 
 url = "https://restapi.amap.com/v3/place/polygon?"
-key = "dd414d3d690331b29f1b25aeebd7c4fd"
+key = "605ea91227d24e0200a206253c661f86"
 types = "010000|020000|030000|040000|050000|060000|070000|080000|090000|100000|110000|120000|130000|140000|150000" \
         "|160000|170000|180000|190000|200000"
 output = "json"
@@ -32,7 +33,15 @@ def searchPOIByDistrict(polygon_list):
 
     # 保存结果
     pois = []
-    response = request.urlopen(integrityUrl + "&page=" + str(page))
+
+    header = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36'}
+    req = request.Request(url, headers=header)
+    proxy = {'http': '111.230.254.195:8118'}
+    handler = request.ProxyHandler(proxy)
+    opener = request.build_opener(handler)
+    request.install_opener(opener)
+    response = request.urlopen(req)
+    # response = request.urlopen(integrityUrl + "&page=" + str(page))
     data = response.read().decode()
     json_data = json.loads(data)
     pois.extend(json_data['pois'])
@@ -61,7 +70,7 @@ def saveToRedis(id, polygon):
 
 
 def saveToFile(id, pois):
-    file = open("F:\FCD data\shenzhen_map_poi/taz_poi_" + str(id), 'w')
+    file = open("F:/TaxiData/shenzhen_map_poi/taz_poi_" + str(id), 'w')
     file.write(str(pois))
     file.close()
 
@@ -83,8 +92,8 @@ def getPOIofDistrict(districtId='districtId'):
 
 
 def saveToRedis_1(id):
-    polygon = list(json.loads(str(r.get("taz_" + str(id)), 'utf-8')))
-    polygon = [point for key, point in enumerate(polygon) if key % 2 == 0]
+    xmin, xmax, ymin, ymax = list(map(float, str(r.get("taz_grid_" + str(id)), 'utf-8').split(";")))
+    polygon = [[xmin, ymin], [xmin, ymax], [xmax, ymin], [xmax, ymax]]
     saveToRedis(id, polygon)
     print(id)
 
@@ -96,7 +105,7 @@ def main(argv=None):
     # saveToRedis()
     # print(getPOIofDistrict())
     pool = ThreadPoolExecutor(8)
-    for i in range(991, 1000):
+    for i in range(41, 100):
         pool.submit(saveToRedis_1(i))
 
 

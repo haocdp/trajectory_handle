@@ -9,7 +9,12 @@ import redis
 from concurrent.futures import ThreadPoolExecutor
 
 url = "https://restapi.amap.com/v3/place/polygon?"
-key = "dd414d3d690331b29f1b25aeebd7c4fd"
+# key = "dd414d3d690331b29f1b25aeebd7c4fd"
+# key = "605ea91227d24e0200a206253c661f86"
+# key = "b558d17423b2316ddb27a6b5fba5ce7f"
+# key = "7a88edfabfeb9ae56590027a057ac327"
+# key = "85af59d9cd4c97775933411315091f9e"
+key = "c734e451ee361a3649edce2efe983d72"
 types = "010000|020000|030000|040000|050000|060000|070000|080000|090000|100000|110000|120000|130000|140000|150000" \
         "|160000|170000|180000|190000|200000"
 output = "json"
@@ -61,7 +66,7 @@ def saveToRedis(id, polygon):
 
 
 def saveToFile(id, pois):
-    file = open("F:\FCD data\shenzhen_map_poi/taz_poi_" + str(id), 'w')
+    file = open("F:/TaxiData/shenzhen_map_poi/taz_poi_" + str(id), 'w')
     file.write(str(pois))
     file.close()
 
@@ -83,8 +88,8 @@ def getPOIofDistrict(districtId='districtId'):
 
 
 def saveToRedis_1(id):
-    polygon = list(json.loads(str(r.get("taz_" + str(id)), 'utf-8')))
-    polygon = [point for key, point in enumerate(polygon) if key % 2 == 0]
+    xmin, xmax, ymin, ymax = list(map(float, str(r.get("taz_grid_" + str(id)), 'utf-8').split(";")))
+    polygon = [[xmin, ymin], [xmin, ymax], [xmax, ymin], [xmax, ymax]]
     saveToRedis(id, polygon)
     print(id)
 
@@ -96,7 +101,7 @@ def main(argv=None):
     # saveToRedis()
     # print(getPOIofDistrict())
     pool = ThreadPoolExecutor(8)
-    for i in range(1067, 1068):
+    for i in range(774, 800):
         pool.submit(saveToRedis_1(i))
 
 
