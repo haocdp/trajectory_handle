@@ -135,7 +135,7 @@ def write_file(key, plateNumber_dict, path):
     if key == '\n' or key is '\n':
         return
 
-    file = open(path + "/" + key + ".txt", 'w', encoding="gbk")
+    file = open(path + "/" + key + ".txt", 'w', encoding="utf-8")
     for line in plateNumber_dict.get(key):
         file.write(line)
     file.close()
