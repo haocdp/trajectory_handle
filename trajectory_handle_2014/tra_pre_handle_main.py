@@ -1,0 +1,7 @@
+from get import getPoi_grid
+from trajectory_handle_2014 import get_trajectory_from_point_destination
+from trajectory_handle_2014 import get_trajectory_destination
+
+# getPoi_grid.run()
+get_trajectory_from_point_destination.run()
+get_trajectory_destination.run()

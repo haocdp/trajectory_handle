@@ -85,7 +85,7 @@ def get_point_region(point):
     for key in taz_dict.keys():
         polygon = taz_dict.get(key)
         if is_point_in_polygon(point, polygon) is True:
-            return str(key).split("_")[1]
+            return str(key).split("_")[-1]
     return -1
 
 
@@ -203,7 +203,7 @@ def main(argv=None):
         argv = sys.argv
 
     divide_trajectory_by_car(base_path + "/taxiData/rawData/24", "2014-10-24")
-
+    # divide_trajectory_by_car(base_path + "/taxiData/rawData_test/24", "2014-10-24")
 
 if __name__ == "__main__":
     sys.exit(main())
