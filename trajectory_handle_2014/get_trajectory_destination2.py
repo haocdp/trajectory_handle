@@ -14,7 +14,7 @@ windows_path = "F:/TaxiData"
 linux_path = "/root/taxiData"
 base_path = linux_path
 
-file_path = "2014-10-20"
+file_path = "2014-10-21"
 
 
 # 加载聚类数据
