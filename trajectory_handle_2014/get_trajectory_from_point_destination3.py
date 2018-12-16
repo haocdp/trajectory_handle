@@ -14,7 +14,7 @@ windows_path = "F:/TaxiData"
 linux_path = "/root/taxiData"
 base_path = linux_path
 
-file_dir = "2014-10-20"
+file_dir = "2014-10-22"
 
 
 def get_weekday_trajectory(path):
