@@ -33,7 +33,7 @@ LAYER_NUM = 2
 
 linux_path = "/root/taxiData"
 windows_path = "F:/FCD data"
-base_path = linux_path
+base_path = windows_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
@@ -41,30 +41,31 @@ label_size = len(set(labels))
 
 
 def load_data():
-    filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20result_npy.npy"
-    filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21result_npy.npy"
-    filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22result_npy.npy"
-    filepath4 = base_path + "/trajectory/2014-10-23/trajectory_2014-10-23result_npy.npy"
-    filepath5 = base_path + "/trajectory/2014-10-24/trajectory_2014-10-24result_npy.npy"
-    filepath6 = base_path + "/trajectory/2014-10-25/trajectory_2014-10-25result_npy.npy"
-    filepath7 = base_path + "/trajectory/2014-10-26/trajectory_2014-10-26result_npy.npy"
+    filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
+    # filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20result_npy.npy"
+    # filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21result_npy.npy"
+    # filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22result_npy.npy"
+    # filepath4 = base_path + "/trajectory/2014-10-23/trajectory_2014-10-23result_npy.npy"
+    # filepath5 = base_path + "/trajectory/2014-10-24/trajectory_2014-10-24result_npy.npy"
+    # filepath6 = base_path + "/trajectory/2014-10-25/trajectory_2014-10-25result_npy.npy"
+    # filepath7 = base_path + "/trajectory/2014-10-26/trajectory_2014-10-26result_npy.npy"
 
     trajectories1 = list(np.load(filepath1))
-    trajectories2 = list(np.load(filepath2))
-    trajectories3 = list(np.load(filepath3))
-    trajectories4 = list(np.load(filepath4))
-    trajectories5 = list(np.load(filepath5))
-    trajectories6 = list(np.load(filepath6))
-    trajectories7 = list(np.load(filepath7))
+    # trajectories2 = list(np.load(filepath2))
+    # trajectories3 = list(np.load(filepath3))
+    # trajectories4 = list(np.load(filepath4))
+    # trajectories5 = list(np.load(filepath5))
+    # trajectories6 = list(np.load(filepath6))
+    # trajectories7 = list(np.load(filepath7))
 
     all_trajectories = []
     all_trajectories.extend(trajectories1)
-    all_trajectories.extend(trajectories2)
-    all_trajectories.extend(trajectories3)
-    all_trajectories.extend(trajectories4)
-    all_trajectories.extend(trajectories5)
-    all_trajectories.extend(trajectories6)
-    all_trajectories.extend(trajectories7)
+    # all_trajectories.extend(trajectories2)
+    # all_trajectories.extend(trajectories3)
+    # all_trajectories.extend(trajectories4)
+    # all_trajectories.extend(trajectories5)
+    # all_trajectories.extend(trajectories6)
+    # all_trajectories.extend(trajectories7)
 
     # 打乱
     random.shuffle(all_trajectories)
@@ -128,12 +129,13 @@ def load_data():
         c += 1
     return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix
 
+
 # trajectory dataset
 train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix = load_data()
 train_data = torch.FloatTensor(train_data)
 train_labels = torch.LongTensor(train_labels)
-test_data = torch.FloatTensor(test_data).cuda() if gpu_avaliable else torch.FloatTensor(test_data)
-test_labels = torch.LongTensor(test_labels).cuda() if gpu_avaliable else torch.LongTensor(test_labels)
+test_data = torch.FloatTensor(test_data)
+test_labels = torch.LongTensor(test_labels)
 
 torch_dataset = Data.TensorDataset(train_data, train_labels)
 loader = Data.DataLoader(
@@ -205,7 +207,8 @@ class MLP(nn.Module):
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.week_embeds(torch.LongTensor([item[3].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.time_embeds(torch.LongTensor([item[4].item()]))[0]))
-
+        if gpu_avaliable:
+            new_vector = torch.cat((new_vector, self.car_embeds(torch.cuda)))
         x = new_vector.view(-1, 390)
         x = self.layers(x)
         x = F.softmax(x, dim=1)
@@ -249,7 +252,7 @@ for epoch in range(EPOCH):
                 else:
                     pred_y = torch.max(test_output, 1)[1].data.numpy()
                 all_pred_y.extend(pred_y)
-                all_test_y.extend(t_y)
-            accuracy = torch.sum(all_pred_y == all_test_y).type(torch.FloatTensor) / all_test_y.size(0)
+                all_test_y.extend(list(t_y.numpy()))
+            accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
 

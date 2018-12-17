@@ -200,6 +200,7 @@ class RNN(nn.Module):
                         new_vector = torch.cat((new_vector, self.week_embeds(torch.LongTensor([item[3].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.time_embeds(torch.LongTensor([item[4].item()]))[0]))
         x = new_vector.view(-1, 10, 50)
+        # x = x.permute(0, 2, 1)
         if gpu_avaliable:
             x = x.cuda()
         r_out, (h_n, h_c) = self.rnn(x, None)  # None represents zero initial hidden state
@@ -235,7 +236,7 @@ for epoch in range(EPOCH):
         optimizer.step()  # apply gradients
         del b_x, b_y
 
-        if step % 50000 == 0:
+        if step % 10000 == 0:
             all_pred_y = []
             all_test_y = []
             for t_step, (t_x, t_y) in enumerate(test_loader):
@@ -250,7 +251,7 @@ for epoch in range(EPOCH):
                 else:
                     pred_y = torch.max(test_output, 1)[1].data.numpy()
                 all_pred_y.extend(pred_y)
-                all_test_y.extend(list(t_y.numpy()))
+                all_test_y.extend(list(t_y.data.cpu().numpy()))
             accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
             print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
 
