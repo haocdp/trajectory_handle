@@ -63,6 +63,7 @@ def load_data():
     # 打乱
     random.shuffle(all_trajectories)
 
+    print("all trajectories num : {}".format(len(all_trajectories)))
     count = len(all_trajectories) * 0.8
 
     train_data = []
