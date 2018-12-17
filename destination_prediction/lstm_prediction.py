@@ -29,13 +29,13 @@ INPUT_SIZE = 30  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.01  # learning rate
 
-labels = list(np.load("/root/data/cluster/destination_labels.npy"))
+labels = list(np.load("F:/FCD data/cluster/destination_labels.npy"))
 # label个数
 label_size = len(set(labels))
 
 
 def load_data():
-    filepath = "/root/data/trajectory/workday_trajectory_destination/youke_1_result_npy.npy"
+    filepath = "F:/FCD data/trajectory/workday_trajectory_destination/youke_1_result_npy.npy"
     trajectories = list(np.load(filepath))
     count = len(trajectories) * 0.8
 

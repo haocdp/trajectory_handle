@@ -1,5 +1,12 @@
 """
 训练数据：（car_id, region_id, poi_id, week_day, time_slot）
+embedding:
+    (car_id -> 16)
+    (week_id -> 3)
+    (time_id -> 8)
+    (poi_id -> 4)
+    (region_id -> 8)
+
 """
 import os
 import torch
@@ -13,14 +20,14 @@ import torch.nn.functional as F
 import random
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 10
 TIME_STEP = 10  # rnn time step / image height
-INPUT_SIZE = 50  # rnn input size / image width
+INPUT_SIZE = 39  # rnn input size / image width
 HIDDEN_SIZE = 128
 LR = 0.01  # learning rate
 LAYER_NUM = 2
@@ -151,11 +158,11 @@ class RNN(nn.Module):
         )
 
         self.out = nn.Linear(HIDDEN_SIZE, label_size)
-        self.car_embeds = nn.Embedding(len(car_to_ix), 10)
-        self.poi_embeds = nn.Embedding(len(poi_to_ix), 10)
-        self.region_embeds = nn.Embedding(1067, 10)
-        self.week_embeds = nn.Embedding(7, 10)
-        self.time_embeds = nn.Embedding(1440, 10)
+        self.car_embeds = nn.Embedding(len(car_to_ix), 16)
+        self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
+        self.region_embeds = nn.Embedding(918, 8)
+        self.week_embeds = nn.Embedding(7, 3)
+        self.time_embeds = nn.Embedding(1440, 8)
 
     def forward(self, x):
         # x shape (batch, time_step, input_size)
