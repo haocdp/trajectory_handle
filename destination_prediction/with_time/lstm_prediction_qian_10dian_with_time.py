@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch.utils.data as Data
 import torch.nn.functional as F
+import random
 
 # torch.manual_seed(1)    # reproducible
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
@@ -17,25 +18,52 @@ gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
-BATCH_SIZE = 32
+BATCH_SIZE = 10
 TIME_STEP = 10  # rnn time step / image height
 INPUT_SIZE = 50  # rnn input size / image width
 HIDDEN_SIZE = 128
 LR = 0.01  # learning rate
 LAYER_NUM = 2
 
-linux_path = "/root/data"
+linux_path = "/root/taxiData"
 windows_path = "F:/FCD data"
+base_path = linux_path
 
-labels = list(np.load(windows_path + "/cluster/destination_labels.npy"))
+labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
 label_size = len(set(labels))
 
 
 def load_data():
-    filepath = windows_path + "/trajectory/allday/youke_1_result_npy.npy"
-    trajectories = list(np.load(filepath))
-    count = len(trajectories) * 0.8
+    filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20result_npy.npy"
+    filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21result_npy.npy"
+    filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22result_npy.npy"
+    filepath4 = base_path + "/trajectory/2014-10-23/trajectory_2014-10-23result_npy.npy"
+    filepath5 = base_path + "/trajectory/2014-10-24/trajectory_2014-10-24result_npy.npy"
+    filepath6 = base_path + "/trajectory/2014-10-25/trajectory_2014-10-25result_npy.npy"
+    filepath7 = base_path + "/trajectory/2014-10-26/trajectory_2014-10-26result_npy.npy"
+
+    trajectories1 = list(np.load(filepath1))
+    trajectories2 = list(np.load(filepath2))
+    trajectories3 = list(np.load(filepath3))
+    trajectories4 = list(np.load(filepath4))
+    trajectories5 = list(np.load(filepath5))
+    trajectories6 = list(np.load(filepath6))
+    trajectories7 = list(np.load(filepath7))
+
+    all_trajectories = []
+    all_trajectories.extend(trajectories1)
+    all_trajectories.extend(trajectories2)
+    all_trajectories.extend(trajectories3)
+    all_trajectories.extend(trajectories4)
+    all_trajectories.extend(trajectories5)
+    all_trajectories.extend(trajectories6)
+    all_trajectories.extend(trajectories7)
+
+    # 打乱
+    random.shuffle(all_trajectories)
+
+    count = len(all_trajectories) * 0.8
 
     train_data = []
     train_labels = []
@@ -45,7 +73,7 @@ def load_data():
     car_to_ix = {}
     poi_to_ix = {}
     region_to_ix = {}
-    for trajectory, label, weekday, time_slot in trajectories:
+    for trajectory, label, weekday, time_slot in all_trajectories:
         for t in trajectory:
             if t[0] not in car_to_ix:
                 car_to_ix[t[0]] = len(car_to_ix)
@@ -78,7 +106,7 @@ def load_data():
         return new_tra
 
     c = 0
-    for trajectory, label, weekday, time_slot in trajectories:
+    for trajectory, label, weekday, time_slot in all_trajectories:
         new_tra = transfer(trajectory, weekday, time_slot)
         new_tra = filter(new_tra)
         if len(new_tra) < 10:
