@@ -8,6 +8,9 @@ embedding:
     (region_id -> 8)
 
 """
+import sys
+if sys.platform == 'linux':
+    sys.path.append('/root/trajectory_handle/')
 import os
 import torch
 from torch import nn
