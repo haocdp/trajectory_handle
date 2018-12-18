@@ -207,6 +207,7 @@ class RNN(nn.Module):
                         new_vector = torch.cat((new_vector, self.time_embeds(torch.LongTensor([item[4].item()]))[0]))
         x = new_vector.view(-1, 10, 50)
         # x = x.permute(0, 2, 1)
+
         if gpu_avaliable:
             x = x.cuda()
         r_out, (h_n, h_c) = self.rnn(x, None)  # None represents zero initial hidden state
