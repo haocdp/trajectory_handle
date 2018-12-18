@@ -11,6 +11,7 @@ import numpy as np
 import torch.utils.data as Data
 import torch.nn.functional as F
 import random
+import logger
 
 # torch.manual_seed(1)    # reproducible
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
@@ -32,7 +33,7 @@ base_path = linux_path
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
 label_size = len(set(labels))
-
+elogger = logger.Logger("lstm_prediction")
 
 def load_data():
     filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20result_npy.npy"
@@ -65,6 +66,7 @@ def load_data():
     random.shuffle(all_trajectories)
 
     print("all trajectories num : {}".format(len(all_trajectories)))
+    elogger.log("all trajectories num : {}".format(len(all_trajectories)))
     count = len(all_trajectories) * 0.8
 
     train_data = []
@@ -216,6 +218,7 @@ rnn = RNN()
 if gpu_avaliable:
     rnn.cuda()
 print(rnn)
+elogger.log(str(rnn))
 
 optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)  # optimize all cnn parameters
 loss_func = nn.CrossEntropyLoss()  # the target label is not one-hotted
@@ -253,7 +256,9 @@ for epoch in range(EPOCH):
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y.data.cpu().numpy()))
             accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
-            print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
+            print_out = 'Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy
+            print(print_out)
+            elogger.log(print_out)
 
 # print 10 predictions from test data
 # test_output = rnn(test_data[:10].view(-1, 10, 5))
