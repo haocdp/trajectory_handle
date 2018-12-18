@@ -211,6 +211,8 @@ class MLP(nn.Module):
 
 
 mlp = MLP()
+if gpu_avaliable:
+    mlp.cuda()
 print(mlp)
 elogger.log(str(mlp))
 
