@@ -9,6 +9,11 @@ embedding:
 
 """
 import os
+import sys
+if sys.platform == 'linux':
+    sys.path.append('/root/trajectory_handle/')
+
+
 import torch
 from torch import nn
 import torchvision.datasets as dsets
@@ -18,9 +23,10 @@ import numpy as np
 import torch.utils.data as Data
 import torch.nn.functional as F
 import random
+import logger
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
@@ -33,44 +39,46 @@ LAYER_NUM = 2
 
 linux_path = "/root/taxiData"
 windows_path = "F:/FCD data"
-base_path = windows_path
+base_path = linux_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
 label_size = len(set(labels))
+elogger = logger.Logger("mlp")
 
 
 def load_data():
-    filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
-    # filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20result_npy.npy"
-    # filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21result_npy.npy"
-    # filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22result_npy.npy"
-    # filepath4 = base_path + "/trajectory/2014-10-23/trajectory_2014-10-23result_npy.npy"
-    # filepath5 = base_path + "/trajectory/2014-10-24/trajectory_2014-10-24result_npy.npy"
-    # filepath6 = base_path + "/trajectory/2014-10-25/trajectory_2014-10-25result_npy.npy"
-    # filepath7 = base_path + "/trajectory/2014-10-26/trajectory_2014-10-26result_npy.npy"
+    # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
+    filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20result_npy.npy"
+    filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21result_npy.npy"
+    filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22result_npy.npy"
+    filepath4 = base_path + "/trajectory/2014-10-23/trajectory_2014-10-23result_npy.npy"
+    filepath5 = base_path + "/trajectory/2014-10-24/trajectory_2014-10-24result_npy.npy"
+    filepath6 = base_path + "/trajectory/2014-10-25/trajectory_2014-10-25result_npy.npy"
+    filepath7 = base_path + "/trajectory/2014-10-26/trajectory_2014-10-26result_npy.npy"
 
     trajectories1 = list(np.load(filepath1))
-    # trajectories2 = list(np.load(filepath2))
-    # trajectories3 = list(np.load(filepath3))
-    # trajectories4 = list(np.load(filepath4))
-    # trajectories5 = list(np.load(filepath5))
-    # trajectories6 = list(np.load(filepath6))
-    # trajectories7 = list(np.load(filepath7))
+    trajectories2 = list(np.load(filepath2))
+    trajectories3 = list(np.load(filepath3))
+    trajectories4 = list(np.load(filepath4))
+    trajectories5 = list(np.load(filepath5))
+    trajectories6 = list(np.load(filepath6))
+    trajectories7 = list(np.load(filepath7))
 
     all_trajectories = []
     all_trajectories.extend(trajectories1)
-    # all_trajectories.extend(trajectories2)
-    # all_trajectories.extend(trajectories3)
-    # all_trajectories.extend(trajectories4)
-    # all_trajectories.extend(trajectories5)
-    # all_trajectories.extend(trajectories6)
-    # all_trajectories.extend(trajectories7)
+    all_trajectories.extend(trajectories2)
+    all_trajectories.extend(trajectories3)
+    all_trajectories.extend(trajectories4)
+    all_trajectories.extend(trajectories5)
+    all_trajectories.extend(trajectories6)
+    all_trajectories.extend(trajectories7)
 
     # 打乱
     random.shuffle(all_trajectories)
 
     print("all trajectories num : {}".format(len(all_trajectories)))
+    elogger.log("all trajectories num : {}".format(len(all_trajectories)))
     count = len(all_trajectories) * 0.8
 
     train_data = []
@@ -127,11 +135,11 @@ def load_data():
             test_data.append(new_tra[:10])
             test_labels.append(label)
         c += 1
-    return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix
+    return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix
 
 
 # trajectory dataset
-train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix = load_data()
+train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix = load_data()
 train_data = torch.FloatTensor(train_data)
 train_labels = torch.LongTensor(train_labels)
 test_data = torch.FloatTensor(test_data)
@@ -156,7 +164,7 @@ class MLP(nn.Module):
         super(MLP, self).__init__()
         self.car_embeds = nn.Embedding(len(car_to_ix), 16)
         self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
-        self.region_embeds = nn.Embedding(918, 8)
+        self.region_embeds = nn.Embedding(len(region_to_ix), 8)
         self.week_embeds = nn.Embedding(7, 3)
         self.time_embeds = nn.Embedding(1440, 8)
 
@@ -173,6 +181,7 @@ class MLP(nn.Module):
         new_vector = None
         for vector in x:
             for item in vector:
+                # print(item)
                 if new_vector is None:
                     if gpu_avaliable:
                         new_vector = torch.cat((self.region_embeds(torch.cuda.LongTensor([item[1].item()]))[0],
@@ -203,6 +212,7 @@ class MLP(nn.Module):
 
 mlp = MLP()
 print(mlp)
+elogger.log(str(mlp))
 
 mlp_optimizer = torch.optim.Adam(mlp.parameters(), lr=LR)
 loss_func = nn.CrossEntropyLoss()  # the target label is not one-hotted
@@ -241,5 +251,7 @@ for epoch in range(EPOCH):
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y))
             accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
-            print('Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy)
+            print_out = 'Epoch: ', epoch, '| train loss: %.4f' % loss.data.cpu().numpy(), '| test accuracy: %.2f' % accuracy
+            print(print_out)
+            elogger.log(str(print_out))
 

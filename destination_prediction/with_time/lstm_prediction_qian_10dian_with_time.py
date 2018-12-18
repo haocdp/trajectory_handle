@@ -2,6 +2,10 @@
 训练数据：（car_id, region_id, poi_id, week_day, time_slot）
 """
 import os
+import sys
+if sys.platform == 'linux':
+    sys.path.append('/root/trajectory_handle/')
+
 import torch
 from torch import nn
 import torchvision.datasets as dsets
