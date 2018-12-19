@@ -25,7 +25,7 @@ gpu_avaliable = torch.cuda.is_available()
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 10
 TIME_STEP = 10  # rnn time step / image height
-INPUT_SIZE = 50  # rnn input size / image width
+INPUT_SIZE = 39  # rnn input size / image width
 HIDDEN_SIZE = 128
 LR = 0.01  # learning rate
 LAYER_NUM = 2
@@ -127,11 +127,11 @@ def load_data():
             test_data.append(new_tra[:10])
             test_labels.append(label)
         c += 1
-    return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix
+    return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix
 
 
 # trajectory dataset
-train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix = load_data()
+train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix = load_data()
 
 train_data = torch.FloatTensor(train_data)
 train_labels = torch.LongTensor(train_labels)
@@ -165,11 +165,11 @@ class RNN(nn.Module):
         )
 
         self.out = nn.Linear(HIDDEN_SIZE, label_size)
-        self.car_embeds = nn.Embedding(len(car_to_ix), 10)
-        self.poi_embeds = nn.Embedding(len(poi_to_ix), 10)
-        self.region_embeds = nn.Embedding(1067, 10)
-        self.week_embeds = nn.Embedding(7, 10)
-        self.time_embeds = nn.Embedding(1440, 10)
+        self.car_embeds = nn.Embedding(len(car_to_ix), 16)
+        self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
+        self.region_embeds = nn.Embedding(len(region_to_ix), 8)
+        self.week_embeds = nn.Embedding(7, 3)
+        self.time_embeds = nn.Embedding(1440, 8)
 
     def forward(self, x):
         # x shape (batch, time_step, input_size)
@@ -205,7 +205,7 @@ class RNN(nn.Module):
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.week_embeds(torch.LongTensor([item[3].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.time_embeds(torch.LongTensor([item[4].item()]))[0]))
-        x = new_vector.view(-1, 10, 50)
+        x = new_vector.view(-1, TIME_STEP, INPUT_SIZE)
         # x = x.permute(0, 2, 1)
 
         if gpu_avaliable:
