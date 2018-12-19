@@ -170,7 +170,7 @@ class RNN(nn.Module):
             bidirectional=True
         )
 
-        self.out = nn.Linear(HIDDEN_SIZE, label_size)
+        self.out = nn.Linear(HIDDEN_SIZE * 2, label_size)
         self.car_embeds = nn.Embedding(len(car_to_ix), 16)
         self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
         self.region_embeds = nn.Embedding(len(region_to_ix), 8)
