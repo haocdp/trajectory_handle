@@ -16,6 +16,7 @@ import torch.utils.data as Data
 import torch.nn.functional as F
 import random
 import logger
+import time
 
 # torch.manual_seed(1)    # reproducible
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
@@ -25,7 +26,7 @@ gpu_avaliable = torch.cuda.is_available()
 EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 128
 TIME_STEP = 10  # rnn time step / image height
-INPUT_SIZE = 50  # rnn input size / image width
+INPUT_SIZE = 39  # rnn input size / image width
 HIDDEN_SIZE = 128
 LR = 0.01  # learning rate
 LAYER_NUM = 2
@@ -117,7 +118,7 @@ def load_data():
     for trajectory, label, weekday, time_slot in all_trajectories:
         new_tra = transfer(trajectory, weekday, time_slot)
         new_tra = filter(new_tra)
-        if len(new_tra) < 10:
+        if len(new_tra) < 100:
             c += 1
             continue
         if c < count:
@@ -127,11 +128,11 @@ def load_data():
             test_data.append(new_tra[:10])
             test_labels.append(label)
         c += 1
-    return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix
+    return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix
 
 
 # trajectory dataset
-train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix = load_data()
+train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix = load_data()
 
 train_data = torch.FloatTensor(train_data)
 train_labels = torch.LongTensor(train_labels)
@@ -166,11 +167,11 @@ class RNN(nn.Module):
         )
 
         self.out = nn.Linear(HIDDEN_SIZE * 2, label_size)
-        self.car_embeds = nn.Embedding(len(car_to_ix), 10)
-        self.poi_embeds = nn.Embedding(len(poi_to_ix), 10)
-        self.region_embeds = nn.Embedding(1067, 10)
-        self.week_embeds = nn.Embedding(7, 10)
-        self.time_embeds = nn.Embedding(1440, 10)
+        self.car_embeds = nn.Embedding(len(car_to_ix), 16)
+        self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
+        self.region_embeds = nn.Embedding(len(region_to_ix), 8)
+        self.week_embeds = nn.Embedding(7, 3)
+        self.time_embeds = nn.Embedding(1440, 8)
 
     def forward(self, x):
         # x shape (batch, time_step, input_size)
@@ -206,7 +207,7 @@ class RNN(nn.Module):
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.week_embeds(torch.LongTensor([item[3].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.time_embeds(torch.LongTensor([item[4].item()]))[0]))
-        x = new_vector.view(-1, 10, 50)
+        x = new_vector.view(-1, TIME_STEP, INPUT_SIZE)
         # x = x.permute(0, 2, 1)
 
         if gpu_avaliable:
@@ -236,7 +237,7 @@ for epoch in range(EPOCH):
             b_x = b_x.cuda()
             b_y = b_y.cuda()
 
-        b_x = b_x.view(-1, 10, 5)  # reshape x to (batch, time_step, input_size)
+        b_x = b_x.view(-1, TIME_STEP, 5)  # reshape x to (batch, time_step, input_size)
 
         output = rnn(b_x)  # rnn output
         loss = loss_func(output, b_y)  # cross entropy loss
@@ -253,7 +254,7 @@ for epoch in range(EPOCH):
                     t_x = t_x.cuda()
                     t_y = t_y.cuda()
 
-                t_x = t_x.view(-1, 10, 5)
+                t_x = t_x.view(-1, TIME_STEP, 5)
                 test_output = rnn(t_x)  # (samples, time_step, input_size)
                 if gpu_avaliable:
                     pred_y = torch.max(test_output, 1)[1].cuda().data
@@ -262,9 +263,12 @@ for epoch in range(EPOCH):
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y.data.cpu().numpy()))
             accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
-            print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + '| test accuracy: %.2f' % accuracy
+            print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + '| test accuracy: %.4f' % accuracy
             print(print_out)
             elogger.log(str(print_out))
+
+# now_time = time.time()
+# torch.save(rnn.state_dict(), base_path + "/models/bi-lstm_prediction_qian_10dian_with_time_" + str(now_time).split(".")[0] + ".pt")
 
 # print 10 predictions from test data
 # test_output = rnn(test_data[:10].view(-1, 10, 5))
