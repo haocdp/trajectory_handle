@@ -29,11 +29,11 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
-EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
+EPOCH = 20  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 128
 TIME_STEP = 8  # rnn time step / image height
 INPUT_SIZE = 59  # rnn input size / image width
-HIDDEN_SIZE = 256
+HIDDEN_SIZE = 128
 LR = 0.01  # learning rate
 LAYER_NUM = 2
 
