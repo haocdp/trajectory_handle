@@ -26,7 +26,7 @@ EPOCH = 10  # train the training data n times, to save time, we just train 1 epo
 BATCH_SIZE = 128
 TIME_STEP = 10  # rnn time step / image height
 INPUT_SIZE = 39  # rnn input size / image width
-HIDDEN_SIZE = 256
+HIDDEN_SIZE = 512
 LR = 0.01  # learning rate
 LAYER_NUM = 2
 
