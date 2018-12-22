@@ -1,11 +1,13 @@
 from math import radians, atan, tan, sin, acos, cos, sqrt
 import torch
 
+
 class Evaluate:
     def __init__(self):
         pass
 
-    def get_distance(self, latA, lonA, latB, lonB):
+    @staticmethod
+    def get_distance(latA, lonA, latB, lonB):
         ra = 6378140
         rb = 6356755
         flatten = (ra - rb) / ra
@@ -26,11 +28,12 @@ class Evaluate:
         except:
             return 0.0000001
 
-    def RMSE(self, pred_y, test_y):
+    @staticmethod
+    def RMSE(pred_y, test_y):
         sum_exp_distance = 0.
         for i, pred_point in enumerate(pred_y):
             test_point = test_y[i]
-            sum_exp_distance += pow(self.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0]), 2)
+            sum_exp_distance += pow(Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0]), 2)
         return sqrt(sum_exp_distance / len(pred_y))
 
     @staticmethod
@@ -43,9 +46,10 @@ class Evaluate:
     def precision(self, pred_y, test_y):
         pass
 
-    def MAE(self, pred_y, test_y):
+    @staticmethod
+    def MAE(pred_y, test_y):
         sum_distance = 0.
         for i, pred_point in enumerate(pred_y):
             test_point = test_y[i]
-            sum_distance += self.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0])
+            sum_distance += Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0])
         return sum_distance / len(pred_y)
