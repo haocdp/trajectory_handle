@@ -16,6 +16,7 @@ import torch.utils.data as Data
 import torch.nn.functional as F
 import random
 import logger
+from destination_prediction.evaluation.Evaluate import Evaluate
 
 # torch.manual_seed(1)    # reproducible
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
@@ -260,8 +261,12 @@ for epoch in range(EPOCH):
                     pred_y = torch.max(test_output, 1)[1].data.numpy()
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y.data.cpu().numpy()))
-            accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
-            print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + '| test accuracy: %.4f' % accuracy
+            # accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
+            # print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + '| test accuracy: %.4f' % accuracy
+            print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + \
+                        '| test accuracy: %.4f' % Evaluate.accuracy(all_pred_y, all_test_y) + \
+                        '| test MAE: %.4f' % Evaluate.MAE(all_pred_y, all_test_y) + \
+                        '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_y)
             print(print_out)
             elogger.log(str(print_out))
 
