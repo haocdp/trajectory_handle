@@ -267,7 +267,7 @@ for epoch in range(EPOCH):
             print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + \
                         '| test accuracy: %.4f' % Evaluate.accuracy(all_pred_y, all_test_y) + \
                         '| test MAE: %.4f' % Evaluate.MAE(all_pred_y, all_test_y) + \
-                        '| test RMSE: %.4f' % Evaluate.MAE(all_pred_y, all_test_y)
+                        '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_y)
             print(print_out)
             elogger.log(str(print_out))
 
