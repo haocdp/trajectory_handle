@@ -35,8 +35,8 @@ class Evaluate:
     def RMSE(pred_y, test_y):
         sum_exp_distance = 0.
         for i, pred_point in enumerate(pred_y):
-            test_point = Evaluate.cluter_center_dict(test_y[i])
-            pred_point = Evaluate.cluter_center_dict(pred_point)
+            test_point = Evaluate.cluter_center_dict[test_y[i]]
+            pred_point = Evaluate.cluter_center_dict[pred_point]
             sum_exp_distance += pow(Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0]), 2)
         return sqrt(sum_exp_distance / len(pred_y))
 
@@ -54,7 +54,7 @@ class Evaluate:
     def MAE(pred_y, test_y):
         sum_distance = 0.
         for i, pred_point in enumerate(pred_y):
-            test_point = Evaluate.cluter_center_dict(test_y[i])
-            pred_point = Evaluate.cluter_center_dict(pred_point)
+            test_point = Evaluate.cluter_center_dict[test_y[i]]
+            pred_point = Evaluate.cluter_center_dict[pred_point]
             sum_distance += Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0])
         return sum_distance / len(pred_y)
