@@ -1,14 +1,21 @@
+import sys
+if sys.platform == 'linux':
+    sys.path.append('/root/trajectory_handle/')
+
 import redis
 from decimal import *
 import numpy as np
+from shenzhen_map.save_region_grid import main
 # 从redis中读取城市网格，并将对应城市区域对应到28 x 60的矩阵中
 
 linux_path = "/root/taxiData"
 windows_path = "F:/TaxiData"
-base_path = windows_path
+base_path = linux_path
 
 
 def get_region_matrix():
+    main()
+
     r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
     taz_grids = {}
     for i in range(918):
