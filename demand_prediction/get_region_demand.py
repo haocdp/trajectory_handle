@@ -60,23 +60,27 @@ def load_data():
     # count = len(all_trajectories) * 0.8
 
     region_demand = []
-    for i in range(28):
+    for i in range(7):
         region_demand.append([])
-        for j in range(60):
+        for j in range(48):
             region_demand[i].append([])
-            for k in range(48):
-                region_demand[i][j].append([-1, -1, -1, -1, -1, -1, -1])
+            for k in range(28):
+                for l in range(60):
+                    region_demand[i][j].append(0)
 
     all_grid, region_to_ix = get_region_matrix()
     for trajectory, label, weekday, time_slot in all_trajectories:
         time_slot = int(time_slot / 30)
         i, j = region_to_ix[int(trajectory[0][-2])]
-        if region_demand[i][j][time_slot][weekday] == -1:
-            region_demand[i][j][time_slot][weekday] = 1
-        else:
-            region_demand[i][j][time_slot][weekday] += 1
+        region_demand[weekday][time_slot][i][j] += 1
 
-    print(region_demand)
     np.save(base_path + "/demand/region_demand", region_demand)
 
+    all_sum = 0
+    for i in range(7):
+        for j in range(48):
+            for k in range(28):
+                for l in range(60):
+                    all_sum += region_demand[i][j][k][l]
+    print(all_sum)
 load_data()
