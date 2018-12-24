@@ -65,8 +65,9 @@ def load_data():
         for j in range(48):
             region_demand[i].append([])
             for k in range(28):
+                region_demand[i][j].append([])
                 for l in range(60):
-                    region_demand[i][j].append(0)
+                    region_demand[i][j][k].append(0)
 
     all_grid, region_to_ix = get_region_matrix()
     for trajectory, label, weekday, time_slot in all_trajectories:

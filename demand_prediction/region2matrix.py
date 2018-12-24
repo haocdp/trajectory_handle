@@ -43,13 +43,11 @@ def get_region_matrix():
             ymin = region_ymin
 
     for key in taz_grids.keys():
-        if key == 819:
-            print('test')
         region_xmin = taz_grids.get(key)[0]
         region_ymin = taz_grids.get(key)[2]
         i = int(float(region_xmin - xmin) / 0.015)
         j = 27 - int(float(region_ymin - ymin) / 0.015)
-        print("i = {}, j = {}".format(i, j))
+        # print("i = {}, j = {}".format(i, j))
         all_grid[j][i] = key
         region_to_ix[key] = (j, i)
 
