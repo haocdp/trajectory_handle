@@ -12,7 +12,7 @@ import numpy as np
 
 windows_path = "F:/TaxiData"
 linux_path = "/root/taxiData"
-base_path = windows_path
+base_path = linux_path
 
 file_dir = "2014-10-21"
 
@@ -129,7 +129,7 @@ def get_weekday_trajectory(path):
                     file_youke.write("\n")
                 count = count + 1
                 pre_point_status = item[4]
-                trajectory.clear()
+                trajectory = []
                 trajectory.append(item[0:6])
 
         if len(item) == 0:

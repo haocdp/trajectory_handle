@@ -129,7 +129,7 @@ def get_weekday_trajectory(path):
                     file_youke.write("\n")
                 count = count + 1
                 pre_point_status = item[4]
-                trajectory.clear()
+                trajectory = []
                 trajectory.append(item[0:6])
 
         if len(item) == 0:
