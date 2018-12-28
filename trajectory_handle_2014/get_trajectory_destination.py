@@ -113,7 +113,7 @@ def classify_point(filepath, result_filepath):
             new_trajectory.append(new_point)
             # point.append(poi_dict[int(point[-1])] if int(point[-1]) in poi_dict.keys() else -1)
         cluster_class = get_cluster_num(cluster_dict, list(map(float, trajectory[-1][1:3])))
-        trajectory_destination = (new_trajectory, cluster_class, week_day, timeslot)
+        trajectory_destination = (new_trajectory[:10], new_trajectory[-1], cluster_class, week_day, timeslot)
         trajectories.append(trajectory_destination)
         result.write(str(new_trajectory) + ";" + str(cluster_class) + ";" + str(week_day) + ";" + str(timeslot) + '\n')
         # end_time = time.time()

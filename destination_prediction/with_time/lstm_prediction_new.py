@@ -1,5 +1,8 @@
 """
 训练数据：（car_id, region_id, poi_id, week_day, time_slot）
+在get_trajectory_destination中对轨迹数据进行精减，只保存前十个轨迹点和最后一个轨迹点
+返回数据格式：(trajectories, point, label, weekday, time_slot)
+因此本文件中需要在测试数据中加入point，来测量预测结果与实际结果的距离
 """
 import os
 import sys
@@ -101,9 +104,9 @@ def load_data():
 
     train_data = []
     train_labels = []
-    train_dest = []
     test_data = []
     test_labels = []
+    test_dest = []
 
     car_to_ix = {}
     poi_to_ix = {}
@@ -141,7 +144,7 @@ def load_data():
         return new_tra
 
     c = 0
-    for trajectory, label, weekday, time_slot in all_trajectories:
+    for trajectory, point, label, weekday, time_slot in all_trajectories:
         for t in trajectory:
             if t[0] not in car_to_ix:
                 car_to_ix[t[0]] = len(car_to_ix)
@@ -163,6 +166,7 @@ def load_data():
         else:
             test_data.append(new_tra[:10])
             test_labels.append(label)
+            test_dest.append(point[1:2])
         c += 1
         del new_tra
         del trajectory
@@ -170,17 +174,17 @@ def load_data():
 
     del all_trajectories
     gc.collect()
-    return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix
+    return train_data, train_labels, test_data, test_labels, test_dest, car_to_ix, poi_to_ix, region_to_ix
 
 
 # trajectory dataset
-train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix = load_data()
+train_data, train_labels, test_data, test_labels, test_dest, car_to_ix, poi_to_ix, region_to_ix = load_data()
 
 train_data = torch.FloatTensor(train_data)
 train_labels = torch.LongTensor(train_labels)
-
 test_data = torch.FloatTensor(test_data)
 test_labels = torch.LongTensor(test_labels)
+test_dest = torch.FloatTensor(test_dest)
 
 torch_dataset = Data.TensorDataset(train_data, train_labels)
 loader = Data.DataLoader(
@@ -189,7 +193,7 @@ loader = Data.DataLoader(
     shuffle=True  # 要不要打乱数据 (打乱比较好)
 )
 
-test_dataset = Data.TensorDataset(test_data, test_labels)
+test_dataset = Data.TensorDataset(test_data, test_labels, test_dest)
 test_loader = Data.DataLoader(
     dataset=test_dataset,
     batch_size=BATCH_SIZE,
@@ -291,10 +295,12 @@ for epoch in range(EPOCH):
         if step % 10000 == 0:
             all_pred_y = []
             all_test_y = []
-            for t_step, (t_x, t_y) in enumerate(test_loader):
+            all_test_d = []
+            for t_step, (t_x, t_y, t_d) in enumerate(test_loader):
                 if gpu_avaliable:
                     t_x = t_x.cuda()
                     t_y = t_y.cuda()
+                    t_d = t_d.cuda()
 
                 t_x = t_x.view(-1, 10, 5)
                 test_output = rnn(t_x)  # (samples, time_step, input_size)
@@ -304,12 +310,13 @@ for epoch in range(EPOCH):
                     pred_y = torch.max(test_output, 1)[1].data.numpy()
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y.data.cpu().numpy()))
+                all_test_d.extend(list(t_d.data.cpu().numpy()))
             # accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
             # print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + '| test accuracy: %.4f' % accuracy
             print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + \
                         '| test accuracy: %.4f' % Evaluate.accuracy(all_pred_y, all_test_y) + \
-                        '| test MAE: %.4f' % Evaluate.MAE(all_pred_y, all_test_y) + \
-                        '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_y)
+                        '| test MAE: %.4f' % Evaluate.MAE(all_pred_y, all_test_d) + \
+                        '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_d)
             print(print_out)
             elogger.log(str(print_out))
 

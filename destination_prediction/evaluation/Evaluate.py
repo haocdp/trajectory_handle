@@ -40,7 +40,7 @@ class Evaluate:
                 pred_point = Evaluate.cluter_center_dict[pred_point.item()]
             else:
                 pred_point = Evaluate.cluter_center_dict[pred_point]
-            test_point = Evaluate.cluter_center_dict[test_y[i]]
+            test_point = test_y[i]
             sum_exp_distance += pow(Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0]), 2)
         return sqrt(sum_exp_distance / len(pred_y))
 
@@ -62,6 +62,6 @@ class Evaluate:
                 pred_point = Evaluate.cluter_center_dict[pred_point.item()]
             else:
                 pred_point = Evaluate.cluter_center_dict[pred_point]
-            test_point = Evaluate.cluter_center_dict[test_y[i]]
+            test_point = test_y[i]
             sum_distance += Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0])
         return sum_distance / len(pred_y)
