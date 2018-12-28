@@ -69,7 +69,13 @@ def load_data():
     all_trajectories.extend(trajectories6)
     all_trajectories.extend(trajectories7)
 
-    del trajectories1, trajectories2, trajectories3, trajectories4, trajectories5, trajectories6, trajectories7
+    del trajectories1
+    del trajectories2
+    del trajectories3
+    del trajectories4
+    del trajectories5
+    del trajectories6
+    del trajectories7
     gc.collect()
 
     # 打乱
