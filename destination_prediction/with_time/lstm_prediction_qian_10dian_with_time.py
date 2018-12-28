@@ -93,14 +93,14 @@ def load_data():
     car_to_ix = {}
     poi_to_ix = {}
     region_to_ix = {}
-    for trajectory, label, weekday, time_slot in all_trajectories:
-        for t in trajectory:
-            if t[0] not in car_to_ix:
-                car_to_ix[t[0]] = len(car_to_ix)
-            if t[-1] not in poi_to_ix:
-                poi_to_ix[t[-1]] = len(poi_to_ix)
-            if t[-2] not in region_to_ix:
-                region_to_ix[t[-2]] = len(region_to_ix)
+    # for trajectory, label, weekday, time_slot in all_trajectories:
+    #     for t in trajectory:
+    #         if t[0] not in car_to_ix:
+    #             car_to_ix[t[0]] = len(car_to_ix)
+    #         if t[-1] not in poi_to_ix:
+    #             poi_to_ix[t[-1]] = len(poi_to_ix)
+    #         if t[-2] not in region_to_ix:
+    #             region_to_ix[t[-2]] = len(region_to_ix)
 
     def transfer(tra, weekday, time_slot):
         new_tra = []
@@ -127,6 +127,14 @@ def load_data():
 
     c = 0
     for trajectory, label, weekday, time_slot in all_trajectories:
+        for t in trajectory:
+            if t[0] not in car_to_ix:
+                car_to_ix[t[0]] = len(car_to_ix)
+            if t[-1] not in poi_to_ix:
+                poi_to_ix[t[-1]] = len(poi_to_ix)
+            if t[-2] not in region_to_ix:
+                region_to_ix[t[-2]] = len(region_to_ix)
+                
         new_tra = transfer(trajectory, weekday, time_slot)
         new_tra = filter(new_tra)
         if len(new_tra) < 10:
@@ -139,6 +147,9 @@ def load_data():
             test_data.append(new_tra[:10])
             test_labels.append(label)
         c += 1
+
+    del all_trajectories
+    gc.collect()
     return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix
 
 
