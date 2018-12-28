@@ -135,7 +135,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
     filepath = base_path + "/trajectory/" + file_path + "/trajectory_" + file_path + ".npy"
-    result_filepath = base_path + "/trajectory/" + file_path + "/trajectory_" + file_path + "_result"
+    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
     classify_point(filepath, result_filepath)
 
 

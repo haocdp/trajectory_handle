@@ -15,6 +15,7 @@ linux_path = "/root/taxiData"
 base_path = linux_path
 
 file_path = "2014-10-22"
+dir_path = "/new_trajectory/"
 
 
 # 加载聚类数据
@@ -54,6 +55,18 @@ def get_weekday_time(time):
     return week_day, timeslot
 
 
+# 过滤轨迹，如果轨迹存在连续相同区域，则进行过滤
+def filter(tra):
+    first_index = tra[0]
+    new_tra = [tra[0]]
+    for t in tra:
+        if t[1] == first_index[1]:
+            continue
+        new_tra.append(t)
+        first_index = t
+    return new_tra
+
+
 def get_cluster_num(cluster_dict, point):
     min_distance = sys.float_info.max
     cluster_class = -1
@@ -84,7 +97,7 @@ def classify_point(filepath, result_filepath):
         # if line == '' or line == '\n':
         #     continue
         # trajectory = literal_eval(line.strip('\n'))
-        trajectory = line
+        trajectory = filter(line)
         new_trajectory = []
         if len(trajectory) <= 10:
             count += 1
@@ -113,7 +126,7 @@ def classify_point(filepath, result_filepath):
 
 def run():
     filepath = base_path + "/trajectory/" + file_path + "/trajectory_" + file_path + ".npy"
-    result_filepath = base_path + "/trajectory/" + file_path + "/trajectory_" + file_path + "_result"
+    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
     classify_point(filepath, result_filepath)
 
 
@@ -121,7 +134,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
     filepath = base_path + "/trajectory/" + file_path + "/trajectory_" + file_path + ".npy"
-    result_filepath = base_path + "/trajectory/" + file_path + "/trajectory_" + file_path + "_result"
+    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
     classify_point(filepath, result_filepath)
 
 
