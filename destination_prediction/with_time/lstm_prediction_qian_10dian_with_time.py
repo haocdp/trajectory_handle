@@ -17,6 +17,8 @@ import torch.nn.functional as F
 import random
 import logger
 from destination_prediction.evaluation.Evaluate import Evaluate
+import gc
+
 
 # torch.manual_seed(1)    # reproducible
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
@@ -67,8 +69,11 @@ def load_data():
     all_trajectories.extend(trajectories6)
     all_trajectories.extend(trajectories7)
 
+    del trajectories1, trajectories2, trajectories3, trajectories4, trajectories5, trajectories6, trajectories7
+    gc.collect()
+
     # 打乱
-    random.shuffle(all_trajectories)
+    # random.shuffle(all_trajectories)
 
     print("all trajectories num : {}".format(len(all_trajectories)))
     elogger.log("all trajectories num : {}".format(len(all_trajectories)))
