@@ -5,9 +5,6 @@
 过滤规则：
     1、如果文件的第一行的轨迹点状态便是载客，则过滤点这一系列点
     2、如果文件的最后一行的轨迹点状态是载客，则过滤掉这些点
-
-2018/12/29:
-    增加过滤轨迹功能，将轨迹中连续相同的轨迹点过滤点，并保持轨迹在10点加上最后一个轨迹点的长度
 """
 import sys
 import os
@@ -15,9 +12,9 @@ import numpy as np
 
 windows_path = "F:/TaxiData"
 linux_path = "/root/taxiData"
-base_path = linux_path
+base_path = windows_path
 
-file_dir = "2014-10-26"
+file_dir = "2014-10-24"
 
 
 # 过滤轨迹，如果轨迹存在连续相同区域，则进行过滤
@@ -33,7 +30,7 @@ def filter(tra):
 
 
 def get_weekday_trajectory(path):
-    save_path = base_path + "/trajectory/" + file_dir
+    save_path = base_path + "/trajectory_taz/" + file_dir
 
     file_youke_0 = open(save_path + "/youke_0", "w")
     file_youke_1 = open(save_path + "/youke_1", "w")
@@ -184,7 +181,7 @@ def get_weekday_trajectory(path):
 
 
 def run():
-    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + ".npy"
+    npy_path = base_path + "/divide_by_taxi/TAZ_region/car_trajectory_" + file_dir + ".npy"
     # weekend_path = "F:\FCD data\\trajectory\weekend"
     get_weekday_trajectory(npy_path)
 
@@ -192,7 +189,7 @@ def run():
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + ".npy"
+    npy_path = base_path + "/divide_by_taxi/TAZ_region/car_trajectory_" + file_dir + ".npy"
     # weekend_path = "F:\FCD data\\trajectory\weekend"
     get_weekday_trajectory(npy_path)
 

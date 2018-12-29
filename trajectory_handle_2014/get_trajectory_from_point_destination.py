@@ -5,6 +5,9 @@
 过滤规则：
     1、如果文件的第一行的轨迹点状态便是载客，则过滤点这一系列点
     2、如果文件的最后一行的轨迹点状态是载客，则过滤掉这些点
+
+2018/12/29:
+    增加过滤轨迹功能，将轨迹中连续相同的轨迹点过滤点，并保持轨迹在10点加上最后一个轨迹点的长度
 """
 import sys
 import os
@@ -15,6 +18,18 @@ linux_path = "/root/taxiData"
 base_path = linux_path
 
 file_dir = "2014-10-20"
+
+
+# 过滤轨迹，如果轨迹存在连续相同区域，则进行过滤
+def filter(tra):
+    first_index = tra[0]
+    new_tra = [tra[0]]
+    for t in tra:
+        if t[-1] == first_index[-1]:
+            continue
+        new_tra.append(t)
+        first_index = t
+    return new_tra
 
 
 def get_weekday_trajectory(path):
@@ -124,8 +139,14 @@ def get_weekday_trajectory(path):
                         file_youke = file_youke_8
                     elif mod == 9:
                         file_youke = file_youke_9
-                    trajectories.append(trajectory)
-                    file_youke.write(str(trajectory))
+                    trajectory = filter(trajectory)
+                    if len(trajectory) < 11:
+                        continue
+                    new_tra = []
+                    new_tra.extend(trajectory[:10])
+                    new_tra.append(trajectory[-1])
+                    trajectories.append(new_tra)
+                    file_youke.write(str(new_tra))
                     file_youke.write("\n")
                 count = count + 1
                 pre_point_status = item[4]

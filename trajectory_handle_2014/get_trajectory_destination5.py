@@ -97,7 +97,7 @@ def classify_point(filepath, result_filepath):
         # if line == '' or line == '\n':
         #     continue
         # trajectory = literal_eval(line.strip('\n'))
-        trajectory = filter(line)
+        trajectory = line
         new_trajectory = []
         if len(trajectory) <= 10:
             count += 1
@@ -112,7 +112,7 @@ def classify_point(filepath, result_filepath):
             new_trajectory.append(new_point)
             # point.append(poi_dict[int(point[-1])] if int(point[-1]) in poi_dict.keys() else -1)
         cluster_class = get_cluster_num(cluster_dict, list(map(float, trajectory[-1][1:3])))
-        trajectory_destination = (new_trajectory[:10], new_trajectory[-1], cluster_class, week_day, timeslot)
+        trajectory_destination = (new_trajectory, cluster_class, week_day, timeslot)
         trajectories.append(trajectory_destination)
         result.write(str(new_trajectory) + ";" + str(cluster_class) + ";" + str(week_day) + ";" + str(timeslot) + '\n')
         # end_time = time.time()
@@ -121,7 +121,7 @@ def classify_point(filepath, result_filepath):
         if count % 1000 == 0:
             print("has finish: {} %".format(float(count) / all_count * 100))
     result.close()
-    np.save(base_path + "/trajectory/" + file_path + "/trajectory_" + file_path + "result_npy", trajectories)
+    np.save(base_path + dir_path + file_path + "/trajectory_" + file_path + "result_npy", trajectories)
 
 
 def run():
