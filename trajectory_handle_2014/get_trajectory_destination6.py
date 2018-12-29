@@ -15,7 +15,7 @@ linux_path = "/root/taxiData"
 base_path = linux_path
 
 file_path = "2014-10-25"
-dir_path = "/new_trajectory/"
+dir_path = "/trajectory/"
 
 
 # 加载聚类数据
