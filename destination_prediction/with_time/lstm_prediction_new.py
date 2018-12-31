@@ -65,35 +65,12 @@ def load_data():
 
     all_trajectories = []
     all_trajectories.extend(trajectories1)
-    del trajectories1
-    gc.collect()
     all_trajectories.extend(trajectories2)
-    del trajectories2
-    gc.collect()
     all_trajectories.extend(trajectories3)
-    del trajectories3
-    gc.collect()
     all_trajectories.extend(trajectories4)
-    del trajectories4
-    gc.collect()
     all_trajectories.extend(trajectories5)
-    del trajectories5
-    gc.collect()
     all_trajectories.extend(trajectories6)
-    del trajectories6
-    gc.collect()
     all_trajectories.extend(trajectories7)
-    del trajectories7
-    gc.collect()
-
-    # del trajectories1
-    # del trajectories2
-    # del trajectories3
-    # del trajectories4
-    # del trajectories5
-    # del trajectories6
-    # del trajectories7
-    # gc.collect()
 
     # 打乱
     random.shuffle(all_trajectories)
@@ -152,8 +129,6 @@ def load_data():
                 poi_to_ix[t[-1]] = len(poi_to_ix)
             if t[-2] not in region_to_ix:
                 region_to_ix[t[-2]] = len(region_to_ix)
-            del t
-            gc.collect()
 
         new_tra = transfer(trajectory, weekday, time_slot)
         if len(new_tra) < 10:
@@ -165,14 +140,9 @@ def load_data():
         else:
             test_data.append(new_tra[:10])
             test_labels.append(label)
-            test_dest.append(new_tra[-1][1:2])
+            test_dest.append(list(map(float, trajectory[-1][1:3])))
         c += 1
-        del new_tra
-        del trajectory
-        gc.collect()
 
-    del all_trajectories
-    gc.collect()
     return train_data, train_labels, test_data, test_labels, test_dest, car_to_ix, poi_to_ix, region_to_ix
 
 

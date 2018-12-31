@@ -4,8 +4,8 @@ from destination_prediction.evaluation import get_cluster_center
 
 
 class Evaluate:
-    # cluter_center_dict = get_cluster_center.get_cluster_center()
-    # gpu_avaliable = torch.cuda.is_available()
+    cluter_center_dict = get_cluster_center.get_cluster_center()
+    gpu_avaliable = torch.cuda.is_available()
 
     def __init__(self):
         pass
