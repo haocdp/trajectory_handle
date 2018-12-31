@@ -23,9 +23,10 @@ import torch.nn.functional as F
 import random
 from destination_prediction.with_time import GeoConv
 import logger
+from destination_prediction.evaluation.Evaluate import Evaluate
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
@@ -83,6 +84,7 @@ def load_data():
     train_labels = []
     test_data = []
     test_labels = []
+    test_dest = []
 
     car_to_ix = {}
     poi_to_ix = {}
@@ -122,7 +124,7 @@ def load_data():
     c = 0
     for trajectory, label, weekday, time_slot in all_trajectories:
         new_tra = transfer(trajectory, weekday, time_slot)
-        new_tra = filter(new_tra)
+        # new_tra = filter(new_tra)
         if len(new_tra) < 10:
             c += 1
             continue
@@ -132,17 +134,19 @@ def load_data():
         else:
             test_data.append(new_tra[:10])
             test_labels.append(label)
+            test_dest.append(list(map(float, trajectory[-1][1:3])))
         c += 1
-    return train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix
+    return train_data, train_labels, test_data, test_labels, test_dest, car_to_ix, poi_to_ix, region_to_ix
 
 
 # trajectory dataset
-train_data, train_labels, test_data, test_labels, car_to_ix, poi_to_ix, region_to_ix = load_data()
+train_data, train_labels, test_data, test_labels, test_dest, car_to_ix, poi_to_ix, region_to_ix = load_data()
 
 train_data = torch.FloatTensor(train_data)
 train_labels = torch.LongTensor(train_labels)
 test_data = torch.FloatTensor(test_data)
 test_labels = torch.LongTensor(test_labels)
+test_dest = torch.FloatTensor(test_dest)
 
 torch_dataset = Data.TensorDataset(train_data, train_labels)
 loader = Data.DataLoader(
@@ -268,13 +272,15 @@ for epoch in range(EPOCH):
         optimizer.step()  # apply gradients
         del b_x, b_y
 
-        if step % 50000 == 0:
+        if step % 10000 == 0:
             all_pred_y = []
             all_test_y = []
-            for t_step, (t_x, t_y) in enumerate(test_loader):
+            all_test_d = []
+            for t_step, (t_x, t_y, t_d) in enumerate(test_loader):
                 if gpu_avaliable:
                     t_x = t_x.cuda()
                     t_y = t_y.cuda()
+                    t_d = t_d.cuda()
 
                 t_x = t_x.view(-1, 10, 5)
                 test_output = rnn(t_x)  # (samples, time_step, input_size)
@@ -284,9 +290,14 @@ for epoch in range(EPOCH):
                     pred_y = torch.max(test_output, 1)[1].data.numpy()
                     t_y = t_y.data.numpy()
                 all_pred_y.extend(pred_y)
-                all_test_y.extend(list(t_y))
-            accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
-            print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + '| test accuracy: %.4f' % accuracy
+                all_test_y.extend(list(t_y.data.cpu().numpy()))
+                all_test_d.extend(list(t_d.data.cpu().numpy()))
+            # accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
+            # print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + '| test accuracy: %.4f' % accuracy
+            print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + \
+                        '| test accuracy: %.4f' % Evaluate.accuracy(all_pred_y, all_test_y) + \
+                        '| test MAE: %.4f' % Evaluate.MAE(all_pred_y, all_test_d) + \
+                        '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_d)
             print(print_out)
             elogger.log(str(print_out))
 
