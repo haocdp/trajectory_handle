@@ -21,41 +21,41 @@ import numpy as np
 import torch.utils.data as Data
 import torch.nn.functional as F
 import random
-from destination_prediction.with_time import GeoConv
+from destination_prediction.taz import GeoConv_taz
 import logger
 from destination_prediction.evaluation.Evaluate import Evaluate
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
-EPOCH = 20  # train the training data n times, to save time, we just train 1 epoch
-BATCH_SIZE = 128
+EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
+BATCH_SIZE = 64
 TIME_STEP = 8  # rnn time step / image height
-INPUT_SIZE = 59  # rnn input size / image width
-HIDDEN_SIZE = 128
+INPUT_SIZE = 55  # rnn input size / image width
+HIDDEN_SIZE = 256
 LR = 0.01  # learning rate
 LAYER_NUM = 2
 
 linux_path = "/root/taxiData"
-windows_path = "F:/FCD data"
-base_path = linux_path
+windows_path = "F:/TaxiData"
+base_path = windows_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
 label_size = len(set(labels))
-elogger = logger.Logger("CNN_BI-LSTM")
+elogger = logger.Logger("CNN_LSTM")
 
 def load_data():
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
-    filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20_result_npy.npy"
-    filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21_result_npy.npy"
-    filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22_result_npy.npy"
-    filepath4 = base_path + "/trajectory/2014-10-23/trajectory_2014-10-23_result_npy.npy"
-    filepath5 = base_path + "/trajectory/2014-10-24/trajectory_2014-10-24_result_npy.npy"
-    filepath6 = base_path + "/trajectory/2014-10-25/trajectory_2014-10-25_result_npy.npy"
-    filepath7 = base_path + "/trajectory/2014-10-26/trajectory_2014-10-26_result_npy.npy"
+    filepath1 = base_path + "/trajectory_taz/2014-10-20/trajectory_2014-10-20result_npy.npy"
+    filepath2 = base_path + "/trajectory_taz/2014-10-21/trajectory_2014-10-21result_npy.npy"
+    filepath3 = base_path + "/trajectory_taz/2014-10-22/trajectory_2014-10-22result_npy.npy"
+    filepath4 = base_path + "/trajectory_taz/2014-10-23/trajectory_2014-10-23result_npy.npy"
+    filepath5 = base_path + "/trajectory_taz/2014-10-24/trajectory_2014-10-24result_npy.npy"
+    filepath6 = base_path + "/trajectory_taz/2014-10-25/trajectory_2014-10-25result_npy.npy"
+    filepath7 = base_path + "/trajectory_taz/2014-10-26/trajectory_2014-10-26result_npy.npy"
 
     trajectories1 = list(np.load(filepath1))
     trajectories2 = list(np.load(filepath2))
@@ -106,7 +106,7 @@ def load_data():
             new_t.append(region_to_ix[t[5]])
             new_t.append(poi_to_ix[t[6]])
             new_t.append(weekday)
-            new_t.append(time_slot)
+            new_t.append(time_slot / 30)
             new_tra.append(new_t)
         return new_tra
 
@@ -124,7 +124,7 @@ def load_data():
     c = 0
     for trajectory, label, weekday, time_slot in all_trajectories:
         new_tra = transfer(trajectory, weekday, time_slot)
-        new_tra = filter(new_tra)
+        # new_tra = filter(new_tra)
         if len(new_tra) < 10:
             c += 1
             continue
@@ -171,17 +171,16 @@ class RNN(nn.Module):
             hidden_size=HIDDEN_SIZE,  # rnn hidden unit
             num_layers=LAYER_NUM,  # number of rnn layer
             batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
-            bidirectional=True
         )
 
-        self.out = nn.Linear(HIDDEN_SIZE * 2, label_size)
+        self.out = nn.Linear(HIDDEN_SIZE, label_size)
         self.car_embeds = nn.Embedding(len(car_to_ix), 16)
-        self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
+        self.poi_embeds = nn.Embedding(len(poi_to_ix), 2)
         self.region_embeds = nn.Embedding(len(region_to_ix), 8)
         self.week_embeds = nn.Embedding(7, 3)
-        self.time_embeds = nn.Embedding(1440, 8)
+        self.time_embeds = nn.Embedding(48, 4)
 
-        self.conv = GeoConv.Net()
+        self.conv = GeoConv_taz.Net()
 
     def forward(self, x):
         # x shape (batch, time_step, input_size)
@@ -229,11 +228,11 @@ class RNN(nn.Module):
                     embedding_vector = torch.cat((embedding_vector, self.week_embeds(torch.LongTensor([vector[0][3].item()]))[0]))
                     embedding_vector = torch.cat((embedding_vector, self.time_embeds(torch.LongTensor([vector[0][4].item()]))[0]))
 
-        new_vector = new_vector.view(-1, 10, 12)
+        new_vector = new_vector.view(-1, 10, 10)
         conv_vector = self.conv(new_vector)
 
         embedding_vector = F.tanh(embedding_vector)
-        embedding_vector = embedding_vector.view(-1, 27)
+        embedding_vector = embedding_vector.view(-1, 23)
         embedding_vector = torch.unsqueeze(embedding_vector, dim=1)
         expand_embedding_vector = embedding_vector.expand(conv_vector.size()[:2] + (embedding_vector.size()[-1],))
         x = torch.cat((conv_vector, expand_embedding_vector), dim=2)
@@ -253,6 +252,7 @@ rnn = RNN()
 if gpu_avaliable:
     rnn.cuda()
 print(rnn)
+elogger.log(str(rnn))
 
 optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)  # optimize all cnn parameters
 loss_func = nn.CrossEntropyLoss()  # the target label is not one-hotted
@@ -264,7 +264,7 @@ for epoch in range(EPOCH):
             b_x = b_x.cuda()
             b_y = b_y.cuda()
 
-        b_x = b_x.view(-1, TIME_STEP, 5)  # reshape x to (batch, time_step, input_size)
+        b_x = b_x.view(-1, 10, 5)  # reshape x to (batch, time_step, input_size)
 
         output = rnn(b_x)  # rnn output
         loss = loss_func(output, b_y)  # cross entropy loss
@@ -283,13 +283,13 @@ for epoch in range(EPOCH):
                     t_y = t_y.cuda()
                     t_d = t_d.cuda()
 
-                t_x = t_x.view(-1, TIME_STEP, 5)
+                t_x = t_x.view(-1, 10, 5)
                 test_output = rnn(t_x)  # (samples, time_step, input_size)
                 if gpu_avaliable:
                     pred_y = torch.max(test_output, 1)[1].cuda().data
                 else:
                     pred_y = torch.max(test_output, 1)[1].data.numpy()
-                    t_y = t_y.data.numpy()
+                    # t_y = t_y.data.numpy()
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y.data.cpu().numpy()))
                 all_test_d.extend(list(t_d.data.cpu().numpy()))

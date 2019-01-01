@@ -30,7 +30,7 @@ gpu_avaliable = torch.cuda.is_available()
 EPOCH = 20  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 128
 TIME_STEP = 10  # rnn time step / image height
-INPUT_SIZE = 39  # rnn input size / image width
+INPUT_SIZE = 33  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.01  # learning rate
 LAYER_NUM = 2
@@ -104,7 +104,7 @@ def load_data():
             new_t.append(region_to_ix[t[5]])
             new_t.append(poi_to_ix[t[6]])
             new_t.append(weekday)
-            new_t.append(time_slot)
+            new_t.append(int(time_slot / 30))
             new_tra.append(new_t)
         return new_tra
 
@@ -183,10 +183,10 @@ class RNN(nn.Module):
 
         self.out = nn.Linear(HIDDEN_SIZE, label_size)
         self.car_embeds = nn.Embedding(len(car_to_ix), 16)
-        self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
+        self.poi_embeds = nn.Embedding(len(poi_to_ix), 2)
         self.region_embeds = nn.Embedding(len(region_to_ix), 8)
         self.week_embeds = nn.Embedding(7, 3)
-        self.time_embeds = nn.Embedding(1440, 8)
+        self.time_embeds = nn.Embedding(48, 4)
 
     def forward(self, x):
         # x shape (batch, time_step, input_size)

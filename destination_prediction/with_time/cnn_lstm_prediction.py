@@ -49,13 +49,13 @@ elogger = logger.Logger("CNN_LSTM")
 
 def load_data():
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
-    filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20result_npy.npy"
-    filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21result_npy.npy"
-    filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22result_npy.npy"
-    filepath4 = base_path + "/trajectory/2014-10-23/trajectory_2014-10-23result_npy.npy"
-    filepath5 = base_path + "/trajectory/2014-10-24/trajectory_2014-10-24result_npy.npy"
-    filepath6 = base_path + "/trajectory/2014-10-25/trajectory_2014-10-25result_npy.npy"
-    filepath7 = base_path + "/trajectory/2014-10-26/trajectory_2014-10-26result_npy.npy"
+    filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20_result_npy.npy"
+    filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21_result_npy.npy"
+    filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22_result_npy.npy"
+    filepath4 = base_path + "/trajectory/2014-10-23/trajectory_2014-10-23_result_npy.npy"
+    filepath5 = base_path + "/trajectory/2014-10-24/trajectory_2014-10-24_result_npy.npy"
+    filepath6 = base_path + "/trajectory/2014-10-25/trajectory_2014-10-25_result_npy.npy"
+    filepath7 = base_path + "/trajectory/2014-10-26/trajectory_2014-10-26_result_npy.npy"
 
     trajectories1 = list(np.load(filepath1))
     trajectories2 = list(np.load(filepath2))
@@ -155,7 +155,7 @@ loader = Data.DataLoader(
     shuffle=True  # 要不要打乱数据 (打乱比较好)
 )
 
-test_dataset = Data.TensorDataset(test_data, test_labels)
+test_dataset = Data.TensorDataset(test_data, test_labels, test_dest)
 test_loader = Data.DataLoader(
     dataset=test_dataset,
     batch_size=BATCH_SIZE,
@@ -288,7 +288,7 @@ for epoch in range(EPOCH):
                     pred_y = torch.max(test_output, 1)[1].cuda().data
                 else:
                     pred_y = torch.max(test_output, 1)[1].data.numpy()
-                    t_y = t_y.data.numpy()
+                    # t_y = t_y.data.numpy()
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y.data.cpu().numpy()))
                 all_test_d.extend(list(t_d.data.cpu().numpy()))
