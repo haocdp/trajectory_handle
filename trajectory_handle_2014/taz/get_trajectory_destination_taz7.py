@@ -15,7 +15,7 @@ linux_path = "/root/taxiData"
 base_path = windows_path
 
 file_path = "2014-10-26"
-dir_path = "/trajectory_taz/"
+dir_path = "/trajectory_taz_without_filter/"
 
 
 # 加载聚类数据
@@ -126,7 +126,7 @@ def classify_point(filepath, result_filepath):
 
 
 def run():
-    filepath = base_path + "/trajectory_taz/" + file_path + "/trajectory_" + file_path + ".npy"
+    filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + ".npy"
     result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
     classify_point(filepath, result_filepath)
 
@@ -134,7 +134,7 @@ def run():
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    filepath = base_path + "/trajectory_taz/" + file_path + "/trajectory_" + file_path + ".npy"
+    filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + ".npy"
     result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
     classify_point(filepath, result_filepath)
 
