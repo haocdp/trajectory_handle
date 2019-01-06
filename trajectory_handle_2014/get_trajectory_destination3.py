@@ -12,16 +12,16 @@ import time
 
 windows_path = "F:/TaxiData"
 linux_path = "/root/taxiData"
-base_path = linux_path
+base_path = windows_path
 
 file_path = "2014-10-22"
-dir_path = "/trajectory/"
+dir_path = "/trajectory_without_filter/"
 
 
 # 加载聚类数据
 def init():
-    cluster_dataset = list(np.load("/root/data/cluster/cluster_dataset.npy"))
-    labels = list(np.load("/root/data/cluster/destination_labels.npy"))
+    cluster_dataset = list(np.load(base_path + "/cluster/cluster_dataset.npy"))
+    labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
     cluster_dict = {}
     for index, value in enumerate(labels):
         if value == -1:
@@ -125,7 +125,7 @@ def classify_point(filepath, result_filepath):
 
 
 def run():
-    filepath = base_path + "/trajectory/" + file_path + "/trajectory_" + file_path + ".npy"
+    filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + ".npy"
     result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
     classify_point(filepath, result_filepath)
 
@@ -133,7 +133,7 @@ def run():
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    filepath = base_path + "/trajectory/" + file_path + "/trajectory_" + file_path + ".npy"
+    filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + ".npy"
     result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
     classify_point(filepath, result_filepath)
 

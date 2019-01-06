@@ -27,7 +27,7 @@ gpu_avaliable = torch.cuda.is_available()
 EPOCH = 20  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 128
 TIME_STEP = 10  # rnn time step / image height
-INPUT_SIZE = 39  # rnn input size / image width
+INPUT_SIZE = 35  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.01  # learning rate
 LAYER_NUM = 2
@@ -39,7 +39,7 @@ base_path = linux_path
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
 label_size = len(set(labels))
-elogger = logger.Logger("lstm_prediction")
+elogger = logger.Logger("bi-lstm_prediction")
 
 def load_data():
     filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20_result_npy.npy"
@@ -101,7 +101,7 @@ def load_data():
             new_t.append(region_to_ix[t[5]])
             new_t.append(poi_to_ix[t[6]])
             new_t.append(weekday)
-            new_t.append(time_slot)
+            new_t.append(int(time_slot/30))
             new_tra.append(new_t)
         return new_tra
 
@@ -175,7 +175,7 @@ class RNN(nn.Module):
         self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
         self.region_embeds = nn.Embedding(len(region_to_ix), 8)
         self.week_embeds = nn.Embedding(7, 3)
-        self.time_embeds = nn.Embedding(1440, 8)
+        self.time_embeds = nn.Embedding(48, 4)
 
     def forward(self, x):
         # x shape (batch, time_step, input_size)

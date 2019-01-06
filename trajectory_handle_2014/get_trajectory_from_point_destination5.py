@@ -12,7 +12,7 @@ import numpy as np
 
 windows_path = "F:/TaxiData"
 linux_path = "/root/taxiData"
-base_path = linux_path
+base_path = windows_path
 
 file_dir = "2014-10-24"
 
@@ -30,7 +30,7 @@ def filter(tra):
 
 
 def get_weekday_trajectory(path):
-    save_path = base_path + "/trajectory/" + file_dir
+    save_path = base_path + "/trajectory_without_filter/" + file_dir
 
     file_youke_0 = open(save_path + "/youke_0", "w")
     file_youke_1 = open(save_path + "/youke_1", "w")
@@ -136,15 +136,23 @@ def get_weekday_trajectory(path):
                         file_youke = file_youke_8
                     elif mod == 9:
                         file_youke = file_youke_9
-                    trajectory = filter(trajectory)
+                    # trajectory = filter(trajectory)
                     if len(trajectory) < 11:
                         continue
-                    new_tra = []
-                    new_tra.extend(trajectory[:10])
-                    new_tra.append(trajectory[-1])
-                    trajectories.append(new_tra)
-                    file_youke.write(str(new_tra))
-                    file_youke.write("\n")
+                    if len(trajectory) < 21:
+                        new_tra = []
+                        new_tra.extend(trajectory[:10])
+                        new_tra.append(trajectory[-1])
+                        trajectories.append(new_tra)
+                        file_youke.write(str(new_tra))
+                        file_youke.write("\n")
+                    else:
+                        new_tra = []
+                        new_tra.extend(trajectory[:20])
+                        new_tra.append(trajectory[-1])
+                        trajectories.append(new_tra)
+                        file_youke.write(str(new_tra))
+                        file_youke.write("\n")
                 count = count + 1
                 pre_point_status = item[4]
                 trajectory = []
