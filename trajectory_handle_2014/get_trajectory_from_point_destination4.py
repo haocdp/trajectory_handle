@@ -30,7 +30,7 @@ def filter(tra):
 
 
 def get_weekday_trajectory(path):
-    save_path = base_path + "/trajectory/" + file_dir
+    save_path = base_path + "/trajectory_without_filter/" + file_dir
 
     file_youke_0 = open(save_path + "/youke_0", "w")
     file_youke_1 = open(save_path + "/youke_1", "w")
