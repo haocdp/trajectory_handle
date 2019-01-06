@@ -10,7 +10,7 @@ import sys
 import os
 import numpy as np
 
-windows_path = "F:/TaxiData"
+windows_path = "D:/haoc/data/TaxiData"
 linux_path = "/root/taxiData"
 base_path = windows_path
 

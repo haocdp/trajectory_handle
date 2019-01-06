@@ -10,7 +10,7 @@ import time
 最后得到的是轨迹序列和轨迹最终的目的地
 """
 
-windows_path = "F:/TaxiData"
+windows_path = "D:/haoc/data/TaxiData"
 linux_path = "/root/taxiData"
 base_path = windows_path
 
@@ -20,8 +20,8 @@ dir_path = "/trajectory_taz_without_filter/"
 
 # 加载聚类数据
 def init():
-    cluster_dataset = list(np.load("F:\FCD data\cluster/cluster_dataset.npy"))
-    labels = list(np.load("F:\FCD data/cluster/destination_labels.npy"))
+    cluster_dataset = list(np.load("D:\haoc\data\TaxiData\cluster/cluster_dataset.npy"))
+    labels = list(np.load("D:\haoc\data\TaxiData/cluster/destination_labels.npy"))
     cluster_dict = {}
     for index, value in enumerate(labels):
         if value == -1:
