@@ -139,15 +139,23 @@ def get_weekday_trajectory(path):
                         file_youke = file_youke_8
                     elif mod == 9:
                         file_youke = file_youke_9
-                    trajectory = filter(trajectory)
+                    # trajectory = filter(trajectory)
                     if len(trajectory) < 11:
                         continue
-                    new_tra = []
-                    new_tra.extend(trajectory[:10])
-                    new_tra.append(trajectory[-1])
-                    trajectories.append(new_tra)
-                    file_youke.write(str(new_tra))
-                    file_youke.write("\n")
+                    if len(trajectory) < 21:
+                        new_tra = []
+                        new_tra.extend(trajectory[:10])
+                        new_tra.append(trajectory[-1])
+                        trajectories.append(new_tra)
+                        file_youke.write(str(new_tra))
+                        file_youke.write("\n")
+                    else:
+                        new_tra = []
+                        new_tra.extend(trajectory[:20])
+                        new_tra.append(trajectory[-1])
+                        trajectories.append(new_tra)
+                        file_youke.write(str(new_tra))
+                        file_youke.write("\n")
                 count = count + 1
                 pre_point_status = item[4]
                 trajectory = []
