@@ -15,7 +15,7 @@ import numpy as np
 
 windows_path = "F:/TaxiData"
 linux_path = "/root/taxiData"
-base_path = linux_path
+base_path = windows_path
 
 file_dir = "2014-10-20"
 
