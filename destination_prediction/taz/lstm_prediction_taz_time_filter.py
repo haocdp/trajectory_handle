@@ -30,7 +30,7 @@ gpu_avaliable = torch.cuda.is_available()
 EPOCH = 20  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 128
 TIME_STEP = 10  # rnn time step / image height
-INPUT_SIZE = 33  # rnn input size / image width
+INPUT_SIZE = 37  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.01  # learning rate
 LAYER_NUM = 2
@@ -42,17 +42,17 @@ base_path = windows_path
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
 label_size = len(set(labels))
-elogger = logger.Logger("lstm_prediction_taz")
+elogger = logger.Logger("lstm_prediction_taz_time_filter")
 
 def load_data():
-    filepath1 = base_path + "/trajectory_taz_without_filter/2014-10-20/trajectory_2014-10-20_result_npy.npy"
+    filepath1 = base_path + "/trajectory_taz_without_filter/2014-10-20/trajectory_2014-10-20_result_npy_filter_by_time.npy"
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
-    filepath2 = base_path + "/trajectory_taz_without_filter/2014-10-21/trajectory_2014-10-21_result_npy.npy"
-    filepath3 = base_path + "/trajectory_taz_without_filter/2014-10-22/trajectory_2014-10-22_result_npy.npy"
-    filepath4 = base_path + "/trajectory_taz_without_filter/2014-10-23/trajectory_2014-10-23_result_npy.npy"
-    filepath5 = base_path + "/trajectory_taz_without_filter/2014-10-24/trajectory_2014-10-24_result_npy.npy"
-    filepath6 = base_path + "/trajectory_taz_without_filter/2014-10-25/trajectory_2014-10-25_result_npy.npy"
-    filepath7 = base_path + "/trajectory_taz_without_filter/2014-10-26/trajectory_2014-10-26_result_npy.npy"
+    filepath2 = base_path + "/trajectory_taz_without_filter/2014-10-21/trajectory_2014-10-21_result_npy_filter_by_time.npy"
+    filepath3 = base_path + "/trajectory_taz_without_filter/2014-10-22/trajectory_2014-10-22_result_npy_filter_by_time.npy"
+    filepath4 = base_path + "/trajectory_taz_without_filter/2014-10-23/trajectory_2014-10-23_result_npy_filter_by_time.npy"
+    filepath5 = base_path + "/trajectory_taz_without_filter/2014-10-24/trajectory_2014-10-24_result_npy_filter_by_time.npy"
+    filepath6 = base_path + "/trajectory_taz_without_filter/2014-10-25/trajectory_2014-10-25_result_npy_filter_by_time.npy"
+    filepath7 = base_path + "/trajectory_taz_without_filter/2014-10-26/trajectory_2014-10-26_result_npy_filter_by_time.npy"
 
     trajectories1 = list(np.load(filepath1))
     trajectories2 = list(np.load(filepath2))
@@ -104,7 +104,7 @@ def load_data():
             new_t.append(region_to_ix[t[5]])
             new_t.append(poi_to_ix[t[6]])
             new_t.append(weekday)
-            new_t.append(int(time_slot / 30))
+            new_t.append(time_slot)
             new_tra.append(new_t)
         return new_tra
 
@@ -186,7 +186,7 @@ class RNN(nn.Module):
         self.poi_embeds = nn.Embedding(len(poi_to_ix), 2)
         self.region_embeds = nn.Embedding(len(region_to_ix), 8)
         self.week_embeds = nn.Embedding(7, 3)
-        self.time_embeds = nn.Embedding(48, 4)
+        self.time_embeds = nn.Embedding(1440, 8)
 
     def forward(self, x):
         # x shape (batch, time_step, input_size)
