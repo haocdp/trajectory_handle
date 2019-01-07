@@ -128,9 +128,10 @@ class RNN(nn.Module):
 
         # self.fc = nn.Linear(HIDDEN_SIZE, 1)
         self.fc = nn.Sequential(
-            nn.Linear(HIDDEN_SIZE, 120),
-            nn.Linear(120, 84),
-            nn.Linear(84, 32)
+            nn.Linear(HIDDEN_SIZE, 128),
+            nn.Linear(128, 64),
+            nn.Linear(64, 32),
+            nn.Linear(32, 1)
         )
 
     def forward(self, x):
