@@ -133,7 +133,10 @@ class RNN(nn.Module):
         for batches in x:
             for seqs in batches:
                 before_conv.extend(seqs[-49:].tolist())
-        before_conv = torch.FloatTensor(before_conv)
+        if gpu_avaliable:
+            before_conv = torch.cuda.FloatTensor(before_conv)
+        else:
+            before_conv = torch.FloatTensor(before_conv)
         before_conv = before_conv.view(-1, SEQ_LENGTH, 7, 7)
 
         convs = None
