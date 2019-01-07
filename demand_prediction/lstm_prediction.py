@@ -202,7 +202,7 @@ for epoch in range(EPOCH):
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y.data.cpu().numpy()))
             print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + \
-                        '| test MAE: %.4f' % Evaluate.MAE(all_pred_y, all_test_y) + \
+                        '| test MAE: %.4f' % Evaluate.MAPE(all_pred_y, all_test_y) + \
                         '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_y)
             print(print_out)
             elogger.log(str(print_out))
