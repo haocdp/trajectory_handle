@@ -126,7 +126,12 @@ class RNN(nn.Module):
         else:
             self.conv = Net()
 
-        self.fc = nn.Linear(HIDDEN_SIZE, 1)
+        # self.fc = nn.Linear(HIDDEN_SIZE, 1)
+        self.fc = nn.Sequential(
+            nn.Linear(HIDDEN_SIZE, 120),
+            nn.Linear(120, 84),
+            nn.Linear(84, 32)
+        )
 
     def forward(self, x):
         before_conv = []
