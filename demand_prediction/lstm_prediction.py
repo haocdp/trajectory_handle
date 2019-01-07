@@ -18,7 +18,7 @@ from demand_prediction.evaluation.Evaluate import Evaluate
 from demand_prediction.Demand_Conv import Net
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
