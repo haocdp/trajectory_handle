@@ -6,7 +6,7 @@ import numpy as np
 
 linux_path = "/root/taxiData"
 windows_path = "F:/TaxiData"
-base_path = windows_path
+base_path = linux_path
 
 seq_length = 6
 conv_length = 7
