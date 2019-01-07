@@ -16,7 +16,6 @@ import torch.utils.data as Data
 import torch.nn.functional as F
 import random
 import logger
-from destination_prediction.evaluation.Evaluate import Evaluate
 from demand_prediction.region2matrix import get_region_matrix
 
 # torch.manual_seed(1)    # reproducible
