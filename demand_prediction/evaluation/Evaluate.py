@@ -26,11 +26,11 @@ class Evaluate:
         pass
 
     @staticmethod
-    def MAE(pred_y, test_y):
+    def MAPE(pred_y, test_y):
         sum_distance = 0.
         for i, pred_demand in enumerate(pred_y):
             if Evaluate.gpu_avaliable:
                 pred_demand = pred_demand.item()
             test_demand = test_y[i]
-            sum_distance += abs(pred_demand - test_demand)
+            sum_distance += abs(pred_demand - test_demand) / float(test_demand)
         return sum_distance / len(pred_y)
