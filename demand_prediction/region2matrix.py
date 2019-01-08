@@ -10,10 +10,15 @@ from shenzhen_map.save_region_grid import main
 
 linux_path = "/root/taxiData"
 windows_path = "F:/TaxiData"
-base_path = linux_path
+base_path = windows_path
 
 
 def get_region_matrix():
+    all_grid = np.load(base_path + "/demand/region_matrix.npy").tolist()
+    region_to_ix = np.load(base_path + "/demand/region_to_ix.npy").item()
+    if all_grid is not None and region_to_ix is not None:
+        return all_grid, region_to_ix
+
     main()
 
     r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')

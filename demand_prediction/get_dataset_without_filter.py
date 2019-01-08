@@ -30,7 +30,7 @@ conv_length = 7
 '''
 net_dataset = []
 
-region_demand = np.load(base_path + "/demand/region_demand.npy").tolist()
+region_demand = np.load(base_path + "/demand/region_demand_without_filter.npy").tolist()
 region_matrix = np.load(base_path + "/demand/region_matrix.npy").tolist()
 region_to_ix = np.load(base_path + "/demand/region_to_ix.npy").item()
 
@@ -63,6 +63,6 @@ for weekday, region_timeslot_demand in enumerate(region_demand):
                                 conv_demand[n + 3][p + 3] = demand[k + n][l + p]
                     seq_demand.append((demand[k][l], conv_demand))
                 net_dataset.append(np.array((weekday, time_slot, region_matrix[k][l], seq_demand, seq_set[-1][k][l]),object))
-np.save(base_path + "/demand/net_data", net_dataset)
+np.save(base_path + "/demand/net_data_without_filter", net_dataset)
 
 

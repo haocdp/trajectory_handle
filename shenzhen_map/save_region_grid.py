@@ -7,7 +7,7 @@ import redis
 
 linux_path = "/root/taxiData"
 windows_path = "F:/TaxiData"
-base_path = linux_path
+base_path = windows_path
 
 r = redis.Redis(host='127.0.0.1', port=6379, charset='utf-8')
 path = base_path + "/shenzhen_map/taz.txt"
