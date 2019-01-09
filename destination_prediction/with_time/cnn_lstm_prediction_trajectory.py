@@ -115,7 +115,8 @@ def load_data():
             new_t.append(poi_to_ix[t[6]])
             new_t.append(weekday)
             new_t.append(time_slot)
-            new_t.append()
+            new_t.append((float(t[1]) - min_lng) / dis_lng)
+            new_t.append((float(t[2]) - min_lat) / dis_lat)
             new_tra.append(new_t)
         return new_tra
 
