@@ -35,7 +35,7 @@ BATCH_SIZE = 64
 TIME_STEP = 8  # rnn time step / image height
 INPUT_SIZE = 59  # rnn input size / image width
 HIDDEN_SIZE = 256
-LR = 0.01  # learning rate
+LR = 0.0001  # learning rate
 LAYER_NUM = 2
 
 linux_path = "/root/taxiData"

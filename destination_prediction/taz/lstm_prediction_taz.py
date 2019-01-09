@@ -32,12 +32,12 @@ BATCH_SIZE = 128
 TIME_STEP = 10  # rnn time step / image height
 INPUT_SIZE = 33  # rnn input size / image width
 HIDDEN_SIZE = 256
-LR = 0.01  # learning rate
+LR = 0.0001  # learning rate
 LAYER_NUM = 2
 
 linux_path = "/root/taxiData"
 windows_path = "D:\haoc\data\TaxiData"
-base_path = windows_path
+base_path = linux_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数

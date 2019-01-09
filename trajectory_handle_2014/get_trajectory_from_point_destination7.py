@@ -20,20 +20,8 @@ base_path = windows_path
 file_dir = "2014-10-26"
 
 
-# 过滤轨迹，如果轨迹存在连续相同区域，则进行过滤
-def filter(tra):
-    first_index = tra[0]
-    new_tra = [tra[0]]
-    for t in tra:
-        if t[-1] == first_index[-1]:
-            continue
-        new_tra.append(t)
-        first_index = t
-    return new_tra
-
-
 def get_weekday_trajectory(path):
-    save_path = base_path + "/trajectory_without_filter/" + file_dir
+    save_path = base_path + "/trajectory/" + file_dir
 
     file_youke_0 = open(save_path + "/youke_0", "w")
     file_youke_1 = open(save_path + "/youke_1", "w")
@@ -139,26 +127,12 @@ def get_weekday_trajectory(path):
                         file_youke = file_youke_8
                     elif mod == 9:
                         file_youke = file_youke_9
-                    # trajectory = filter(trajectory)
-                    if len(trajectory) < 11:
-                        continue
-                    if len(trajectory) < 21:
-                        new_tra = []
-                        new_tra.extend(trajectory[:10])
-                        new_tra.append(trajectory[-1])
-                        trajectories.append(new_tra)
-                        file_youke.write(str(new_tra))
-                        file_youke.write("\n")
-                    else:
-                        new_tra = []
-                        new_tra.extend(trajectory[:20])
-                        new_tra.append(trajectory[-1])
-                        trajectories.append(new_tra)
-                        file_youke.write(str(new_tra))
-                        file_youke.write("\n")
+                    trajectories.append(trajectory)
+                    file_youke.write(str(trajectory))
+                    file_youke.write("\n")
                 count = count + 1
                 pre_point_status = item[4]
-                trajectory = []
+                trajectory.clear()
                 trajectory.append(item[0:6])
 
         if len(item) == 0:
