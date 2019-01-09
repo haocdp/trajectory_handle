@@ -7,7 +7,7 @@ import numpy as np
 from torch.autograd import Variable
 
 class Net(nn.Module):
-    def __init__(self, input_size=12, kernel_size=3, num_filter=32):
+    def __init__(self, input_size=40, kernel_size=3, num_filter=32):
         super(Net, self).__init__()
 
         self.kernel_size = kernel_size
