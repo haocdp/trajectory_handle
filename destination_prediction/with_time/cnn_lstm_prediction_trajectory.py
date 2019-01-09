@@ -43,7 +43,7 @@ LR = 0.0001  # learning rate
 LAYER_NUM = 2
 
 linux_path = "/root/taxiData"
-windows_path = "F:/FCD data"
+windows_path = "F:/TaxiData"
 base_path = linux_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
@@ -51,7 +51,7 @@ labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 label_size = len(set(labels))
 elogger = logger.Logger("CNN_LSTM")
 
-min_lng, max_lng, min_lat, max_lat = list(np.load("F:/TaxiData/demand/region_range.npy"))
+min_lng, max_lng, min_lat, max_lat = list(np.load(base_path + "/demand/region_range.npy"))
 dis_lng = max_lng - min_lng
 dis_lat = max_lat - min_lat
 
@@ -183,13 +183,18 @@ class RNN(nn.Module):
             batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
         )
 
-        self.out = nn.Linear(HIDDEN_SIZE, label_size)
+        self.out = nn.Sequential(
+            nn.Linear(HIDDEN_SIZE, 512),
+            nn.Linear(512, label_size)
+        )
         self.car_embeds = nn.Embedding(len(car_to_ix), 16)
         self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
         self.region_embeds = nn.Embedding(len(region_to_ix), 8)
         self.week_embeds = nn.Embedding(7, 3)
         self.time_embeds = nn.Embedding(1440, 8)
 
+        self.region_poi_linear = nn.Linear(12, 32)
+        self.coord_linear = nn.Linear(2, 8)
         self.conv = GeoConv.Net()
 
     def forward(self, x):
@@ -205,16 +210,25 @@ class RNN(nn.Module):
                     if gpu_avaliable:
                         new_vector = torch.cat((self.region_embeds(torch.cuda.LongTensor([item[1].item()]))[0],
                                                 self.poi_embeds(torch.cuda.LongTensor([item[2].item()]))[0]))
+                        new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-2]])))
+                        new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-1]])))
                     else:
                         new_vector = torch.cat((self.region_embeds(torch.LongTensor([item[1].item()]))[0],
                                                 self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
+                        new_vector = torch.cat((new_vector, torch.FloatTensor([item[-2]])))
+                        new_vector = torch.cat((new_vector, torch.FloatTensor([item[-1]])))
                 else:
                     if gpu_avaliable:
                         new_vector = torch.cat((new_vector, self.region_embeds(torch.cuda.LongTensor([item[1].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.cuda.LongTensor([item[2].item()]))[0]))
+                        new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-2]])))
+                        new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-1]])))
                     else:
                         new_vector = torch.cat((new_vector, self.region_embeds(torch.LongTensor([item[1].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
+                        new_vector = torch.cat((new_vector, torch.FloatTensor([item[-2]])))
+                        new_vector = torch.cat((new_vector, torch.FloatTensor([item[-1]])))
+
 
             if embedding_vector is None:
                 if gpu_avaliable:
@@ -238,7 +252,8 @@ class RNN(nn.Module):
                     embedding_vector = torch.cat((embedding_vector, self.week_embeds(torch.LongTensor([vector[0][3].item()]))[0]))
                     embedding_vector = torch.cat((embedding_vector, self.time_embeds(torch.LongTensor([vector[0][4].item()]))[0]))
 
-        new_vector = new_vector.view(-1, 10, 12)
+        new_vector = new_vector.view(-1, 10, 14)
+        new_vector = torch.cat((self.region_poi_linear(new_vector[:, :, :-2]), self.coord_linear(new_vector[:, :, -2:])), 2)
         conv_vector = self.conv(new_vector)
 
         embedding_vector = F.tanh(embedding_vector)
@@ -273,7 +288,7 @@ for epoch in range(EPOCH):
             b_x = b_x.cuda()
             b_y = b_y.cuda()
 
-        b_x = b_x.view(-1, 10, 5)  # reshape x to (batch, time_step, input_size)
+        b_x = b_x.view(-1, 10, 7)  # reshape x to (batch, time_step, input_size)
 
         output = rnn(b_x)  # rnn output
         loss = loss_func(output, b_y)  # cross entropy loss
