@@ -1,11 +1,21 @@
 """
 训练数据：（car_id, region_id, poi_id, week_day, time_slot）
+精细化轨迹，使用坐标转换表示，替代区域表示，并使用卷积来提取局部特征
 """
-import os
+"""
+训练数据：（car_id, region_id, poi_id, week_day, time_slot）
+embedding:
+    (car_id -> 16)
+    (week_id -> 3)
+    (time_id -> 8)
+    (poi_id -> 4)
+    (region_id -> 8)
+
+"""
 import sys
 if sys.platform == 'linux':
     sys.path.append('/root/trajectory_handle/')
-
+import os
 import torch
 from torch import nn
 import torchvision.datasets as dsets
@@ -15,8 +25,8 @@ import numpy as np
 import torch.utils.data as Data
 import torch.nn.functional as F
 import random
+from destination_prediction.with_time import GeoConv
 import logger
-import time
 from destination_prediction.evaluation.Evaluate import Evaluate
 
 # torch.manual_seed(1)    # reproducible
@@ -24,10 +34,10 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
-EPOCH = 20  # train the training data n times, to save time, we just train 1 epoch
-BATCH_SIZE = 128
-TIME_STEP = 10  # rnn time step / image height
-INPUT_SIZE = 35  # rnn input size / image width
+EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
+BATCH_SIZE = 64
+TIME_STEP = 8  # rnn time step / image height
+INPUT_SIZE = 59  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.0001  # learning rate
 LAYER_NUM = 2
@@ -39,11 +49,11 @@ base_path = linux_path
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
 label_size = len(set(labels))
-elogger = logger.Logger("bi-lstm_prediction")
+elogger = logger.Logger("CNN_LSTM")
 
 def load_data():
-    filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20_result_npy.npy"
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
+    filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20_result_npy.npy"
     filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21_result_npy.npy"
     filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22_result_npy.npy"
     filepath4 = base_path + "/trajectory/2014-10-23/trajectory_2014-10-23_result_npy.npy"
@@ -72,7 +82,6 @@ def load_data():
     random.shuffle(all_trajectories)
 
     print("all trajectories num : {}".format(len(all_trajectories)))
-    elogger.log("all trajectories num : {}".format(len(all_trajectories)))
     count = len(all_trajectories) * 0.8
 
     train_data = []
@@ -101,7 +110,7 @@ def load_data():
             new_t.append(region_to_ix[t[5]])
             new_t.append(poi_to_ix[t[6]])
             new_t.append(weekday)
-            new_t.append(int(time_slot/30))
+            new_t.append(time_slot)
             new_tra.append(new_t)
         return new_tra
 
@@ -120,7 +129,7 @@ def load_data():
     for trajectory, label, weekday, time_slot in all_trajectories:
         new_tra = transfer(trajectory, weekday, time_slot)
         # new_tra = filter(new_tra)
-        if len(new_tra) < 100:
+        if len(new_tra) < 10:
             c += 1
             continue
         if c < count:
@@ -157,7 +166,6 @@ test_loader = Data.DataLoader(
     shuffle=True
 )
 
-
 class RNN(nn.Module):
     def __init__(self):
         super(RNN, self).__init__()
@@ -167,15 +175,16 @@ class RNN(nn.Module):
             hidden_size=HIDDEN_SIZE,  # rnn hidden unit
             num_layers=LAYER_NUM,  # number of rnn layer
             batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
-            bidirectional=True
         )
 
-        self.out = nn.Linear(HIDDEN_SIZE * 2, label_size)
+        self.out = nn.Linear(HIDDEN_SIZE, label_size)
         self.car_embeds = nn.Embedding(len(car_to_ix), 16)
         self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
         self.region_embeds = nn.Embedding(len(region_to_ix), 8)
         self.week_embeds = nn.Embedding(7, 3)
-        self.time_embeds = nn.Embedding(48, 4)
+        self.time_embeds = nn.Embedding(1440, 8)
+
+        self.conv = GeoConv.Net()
 
     def forward(self, x):
         # x shape (batch, time_step, input_size)
@@ -183,36 +192,54 @@ class RNN(nn.Module):
         # h_n shape (n_layers, batch, hidden_size)
         # h_c shape (n_layers, batch, hidden_size)
         new_vector = None
+        embedding_vector = None
         for vector in x:
             for item in vector:
                 if new_vector is None:
                     if gpu_avaliable:
-                        new_vector = torch.cat((self.car_embeds(torch.cuda.LongTensor([item[0].item()]))[0],
-                                                self.region_embeds(torch.cuda.LongTensor([item[1].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.poi_embeds(torch.cuda.LongTensor([item[2].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.week_embeds(torch.cuda.LongTensor([item[3].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.time_embeds(torch.cuda.LongTensor([item[4].item()]))[0]))
+                        new_vector = torch.cat((self.region_embeds(torch.cuda.LongTensor([item[1].item()]))[0],
+                                                self.poi_embeds(torch.cuda.LongTensor([item[2].item()]))[0]))
                     else:
-                        new_vector = torch.cat((self.car_embeds(torch.LongTensor([item[0].item()]))[0],
-                                                self.region_embeds(torch.LongTensor([item[1].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.week_embeds(torch.LongTensor([item[3].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.time_embeds(torch.LongTensor([item[4].item()]))[0]))
+                        new_vector = torch.cat((self.region_embeds(torch.LongTensor([item[1].item()]))[0],
+                                                self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
                 else:
                     if gpu_avaliable:
-                        new_vector = torch.cat((new_vector, self.car_embeds(torch.cuda.LongTensor([item[0].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.region_embeds(torch.cuda.LongTensor([item[1].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.cuda.LongTensor([item[2].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.week_embeds(torch.cuda.LongTensor([item[3].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.time_embeds(torch.cuda.LongTensor([item[4].item()]))[0]))
                     else:
-                        new_vector = torch.cat((new_vector, self.car_embeds(torch.LongTensor([item[0].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.region_embeds(torch.LongTensor([item[1].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.week_embeds(torch.LongTensor([item[3].item()]))[0]))
-                        new_vector = torch.cat((new_vector, self.time_embeds(torch.LongTensor([item[4].item()]))[0]))
-        x = new_vector.view(-1, TIME_STEP, INPUT_SIZE)
-        # x = x.permute(0, 2, 1)
+
+            if embedding_vector is None:
+                if gpu_avaliable:
+                    embedding_vector = torch.cat((self.car_embeds(torch.cuda.LongTensor([vector[0][0].item()]))[0],
+                                                  self.week_embeds(torch.cuda.LongTensor([vector[0][3].item()]))[0]))
+                    embedding_vector = torch.cat((embedding_vector, self.time_embeds(torch.cuda.LongTensor([vector[0][4].item()]))[0]))
+                else:
+                    embedding_vector = torch.cat((self.car_embeds(torch.LongTensor([vector[0][0].item()]))[0],
+                                                  self.week_embeds(torch.LongTensor([vector[0][3].item()]))[0]))
+                    embedding_vector = torch.cat((embedding_vector, self.time_embeds(torch.LongTensor([vector[0][4].item()]))[0]))
+            else:
+                if gpu_avaliable:
+                    embedding_vector = torch.cat(
+                        (embedding_vector, self.car_embeds(torch.cuda.LongTensor([vector[0][0].item()]))[0]))
+                    embedding_vector = torch.cat(
+                        (embedding_vector, self.week_embeds(torch.cuda.LongTensor([vector[0][3].item()]))[0]))
+                    embedding_vector = torch.cat(
+                        (embedding_vector, self.time_embeds(torch.cuda.LongTensor([vector[0][4].item()]))[0]))
+                else:
+                    embedding_vector = torch.cat((embedding_vector, self.car_embeds(torch.LongTensor([vector[0][0].item()]))[0]))
+                    embedding_vector = torch.cat((embedding_vector, self.week_embeds(torch.LongTensor([vector[0][3].item()]))[0]))
+                    embedding_vector = torch.cat((embedding_vector, self.time_embeds(torch.LongTensor([vector[0][4].item()]))[0]))
+
+        new_vector = new_vector.view(-1, 10, 12)
+        conv_vector = self.conv(new_vector)
+
+        embedding_vector = F.tanh(embedding_vector)
+        embedding_vector = embedding_vector.view(-1, 27)
+        embedding_vector = torch.unsqueeze(embedding_vector, dim=1)
+        expand_embedding_vector = embedding_vector.expand(conv_vector.size()[:2] + (embedding_vector.size()[-1],))
+        x = torch.cat((conv_vector, expand_embedding_vector), dim=2)
 
         if gpu_avaliable:
             x = x.cuda()
@@ -229,7 +256,6 @@ rnn = RNN()
 if gpu_avaliable:
     rnn.cuda()
 print(rnn)
-elogger.log(str(rnn))
 
 optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)  # optimize all cnn parameters
 loss_func = nn.CrossEntropyLoss()  # the target label is not one-hotted
@@ -241,7 +267,7 @@ for epoch in range(EPOCH):
             b_x = b_x.cuda()
             b_y = b_y.cuda()
 
-        b_x = b_x.view(-1, TIME_STEP, 5)  # reshape x to (batch, time_step, input_size)
+        b_x = b_x.view(-1, 10, 5)  # reshape x to (batch, time_step, input_size)
 
         output = rnn(b_x)  # rnn output
         loss = loss_func(output, b_y)  # cross entropy loss
@@ -260,25 +286,24 @@ for epoch in range(EPOCH):
                     t_y = t_y.cuda()
                     t_d = t_d.cuda()
 
-                t_x = t_x.view(-1, TIME_STEP, 5)
+                t_x = t_x.view(-1, 10, 5)
                 test_output = rnn(t_x)  # (samples, time_step, input_size)
                 if gpu_avaliable:
                     pred_y = torch.max(test_output, 1)[1].cuda().data
                 else:
                     pred_y = torch.max(test_output, 1)[1].data.numpy()
+                    # t_y = t_y.data.numpy()
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y.data.cpu().numpy()))
                 all_test_d.extend(list(t_d.data.cpu().numpy()))
             # accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
+            # print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + '| test accuracy: %.4f' % accuracy
             print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + \
                         '| test accuracy: %.4f' % Evaluate.accuracy(all_pred_y, all_test_y) + \
-                        '| test MAE: %.4f' % Evaluate.MAE(all_pred_y, all_test_y) + \
-                        '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_y)
+                        '| test MAE: %.4f' % Evaluate.MAE(all_pred_y, all_test_d) + \
+                        '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_d)
             print(print_out)
             elogger.log(str(print_out))
-
-# now_time = time.time()
-# torch.save(rnn.state_dict(), base_path + "/models/bi-lstm_prediction_qian_10dian_with_time_" + str(now_time).split(".")[0] + ".pt")
 
 # print 10 predictions from test data
 # test_output = rnn(test_data[:10].view(-1, 10, 5))
