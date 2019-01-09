@@ -51,6 +51,10 @@ labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 label_size = len(set(labels))
 elogger = logger.Logger("CNN_LSTM")
 
+min_lng, max_lng, min_lat, max_lat = list(np.load("F:/TaxiData/demand/region_range.npy"))
+dis_lng = max_lng - min_lng
+dis_lat = max_lat - min_lat
+
 def load_data():
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
     filepath1 = base_path + "/trajectory/2014-10-20/trajectory_2014-10-20_result_npy.npy"
@@ -111,6 +115,7 @@ def load_data():
             new_t.append(poi_to_ix[t[6]])
             new_t.append(weekday)
             new_t.append(time_slot)
+            new_t.append()
             new_tra.append(new_t)
         return new_tra
 
