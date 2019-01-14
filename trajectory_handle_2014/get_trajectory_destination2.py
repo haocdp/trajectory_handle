@@ -10,9 +10,9 @@ import time
 最后得到的是轨迹序列和轨迹最终的目的地
 """
 
-windows_path = "F:/TaxiData"
+windows_path = "D:\haoc\data/TaxiData"
 linux_path = "/root/taxiData"
-base_path = linux_path
+base_path = windows_path
 
 file_path = "2014-10-21"
 dir_path = "/trajectory_without_filter/"
@@ -20,9 +20,10 @@ dir_path = "/trajectory_without_filter/"
 
 # 加载聚类数据
 def init():
-    cluster_dataset = list(np.load(base_path + "/cluster/cluster_dataset.npy"))
-    labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
+    cluster_dataset = list(np.load(base_path + "/cluster/cluster_dataset_new.npy"))
+    labels = list(np.load(base_path + "/cluster/destination_labels_new.npy"))
     cluster_dict = {}
+    cluster_center_dict = {}
     for index, value in enumerate(labels):
         if value == -1:
             continue
@@ -32,7 +33,12 @@ def init():
         # if cluster_dict[value] is None:
         #     cluster_dict[value] = []
         cluster_dict[value].append(list(cluster_dataset[index]))
-    return cluster_dict
+
+    for key in cluster_dict.keys():
+        lng = np.mean([x[0] for x in cluster_dict[key]])
+        lat = np.mean([x[1] for x in cluster_dict[key]])
+        cluster_center_dict[key] = [lng, lat]
+    return cluster_dict, cluster_center_dict
 
 
 # 加载区域POI数据
@@ -60,21 +66,19 @@ def filter(tra):
     first_index = tra[0]
     new_tra = [tra[0]]
     for t in tra:
-        if t[1] == first_index[1]:
+        if t[-1] == first_index[-1]:
             continue
         new_tra.append(t)
         first_index = t
     return new_tra
 
 
-def get_cluster_num(cluster_dict, point):
+def get_cluster_num(cluster_center_dict, point):
     min_distance = sys.float_info.max
     cluster_class = -1
-    for key in cluster_dict.keys():
-        cluster_points = cluster_dict[key]
-        distance = 0
-        for p in cluster_points:
-            distance = distance + dis(point, p)
+    for key in cluster_center_dict.keys():
+        cluster_points = cluster_center_dict[key]
+        distance = dis(point, cluster_points)
         if distance < min_distance:
             min_distance = distance
             cluster_class = key
@@ -82,7 +86,7 @@ def get_cluster_num(cluster_dict, point):
 
 
 def classify_point(filepath, result_filepath):
-    cluster_dict = init()
+    cluster_dict, cluster_center_dict = init()
     poi_dict = init_district_poi()
 
     trajectories = []
@@ -111,7 +115,7 @@ def classify_point(filepath, result_filepath):
             new_point.append(poi_dict[int(point[-1])] if int(point[-1]) in poi_dict.keys() else -1)
             new_trajectory.append(new_point)
             # point.append(poi_dict[int(point[-1])] if int(point[-1]) in poi_dict.keys() else -1)
-        cluster_class = get_cluster_num(cluster_dict, list(map(float, trajectory[-1][1:3])))
+        cluster_class = get_cluster_num(cluster_center_dict, list(map(float, trajectory[-1][1:3])))
         trajectory_destination = (new_trajectory, cluster_class, week_day, timeslot)
         trajectories.append(trajectory_destination)
         result.write(str(new_trajectory) + ";" + str(cluster_class) + ";" + str(week_day) + ";" + str(timeslot) + '\n')
@@ -121,12 +125,12 @@ def classify_point(filepath, result_filepath):
         if count % 1000 == 0:
             print("has finish: {} %".format(float(count) / all_count * 100))
     result.close()
-    np.save(base_path + dir_path + file_path + "/trajectory_" + file_path + "result_npy", trajectories)
+    np.save(base_path + dir_path + file_path + "/trajectory_" + file_path + "_result_new_cluster", trajectories)
 
 
 def run():
     filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + ".npy"
-    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
+    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result_new_cluster"
     classify_point(filepath, result_filepath)
 
 
@@ -134,7 +138,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
     filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + ".npy"
-    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
+    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result_new_cluster"
     classify_point(filepath, result_filepath)
 
 
