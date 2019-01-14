@@ -12,7 +12,7 @@ import time
 
 windows_path = "D:\haoc\data/TaxiData"
 linux_path = "/root/taxiData"
-base_path = windows_path
+base_path = linux_path
 
 file_path = "2014-10-23"
 dir_path = "/trajectory_without_filter/"
