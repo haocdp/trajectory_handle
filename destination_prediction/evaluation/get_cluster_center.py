@@ -1,7 +1,7 @@
 import numpy as np
 
 linux_path = "/root/taxiData"
-windows_path = "F:/TaxiData"
+windows_path = "D:\haoc\data\TaxiData"
 base_path = windows_path
 
 def get_cluster_center():

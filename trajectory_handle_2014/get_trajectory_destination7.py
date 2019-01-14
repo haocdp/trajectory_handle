@@ -10,12 +10,12 @@ import time
 最后得到的是轨迹序列和轨迹最终的目的地
 """
 
-windows_path = "F:/TaxiData"
+windows_path = "D:\haoc\data\TaxiData"
 linux_path = "/root/taxiData"
-base_path = linux_path
+base_path = windows_path
 
-file_path = "2014-10-26"
-dir_path = "/trajectory_without_filter/"
+file_path = "2014-10-21"
+dir_path = "/trajectory_wrong/"
 
 
 # 加载聚类数据
