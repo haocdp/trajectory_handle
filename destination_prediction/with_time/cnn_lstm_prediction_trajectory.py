@@ -307,7 +307,7 @@ for epoch in range(EPOCH):
                     t_y = t_y.cuda()
                     t_d = t_d.cuda()
 
-                t_x = t_x.view(-1, 10, 5)
+                t_x = t_x.view(-1, 10, 7)
                 test_output = rnn(t_x)  # (samples, time_step, input_size)
                 if gpu_avaliable:
                     pred_y = torch.max(test_output, 1)[1].cuda().data
