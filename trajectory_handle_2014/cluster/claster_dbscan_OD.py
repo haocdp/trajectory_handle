@@ -13,37 +13,75 @@ from ast import literal_eval
 def load_dataset(filename):
     origin_dataSet = []
     destination_dataSet = []
-    with open(filename) as fr:
-        for line in fr.readlines():
-            if line == '' or line == '\n':
-                continue
-            trajectory = literal_eval(line.strip('\n'))
-            if len(trajectory) <= 10:
-                continue
-            origin_dataSet.append(list(map(float, trajectory[0][1:3])))
-            destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
 
-    filename2 = "F:\TaxiData/trajectory_taz/2014-10-21/youke_0"
-    filename3 = "F:\TaxiData/trajectory_taz/2014-10-20/youke_0"
-    with open(filename2) as fr:
-        for line in fr.readlines():
-            if line == '' or line == '\n':
-                continue
-            trajectory = literal_eval(line.strip('\n'))
-            if len(trajectory) <= 10:
-                continue
-            origin_dataSet.append(list(map(float, trajectory[0][1:3])))
-            destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
+    trajectories = np.load(filename).tolist()
+    for trajectory, label, time_slot, weekday in trajectories:
+        if len(trajectory) <= 10:
+            continue
+        origin_dataSet.append(list(map(float, trajectory[0][1:3])))
+        destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
 
-    with open(filename3) as fr:
-        for line in fr.readlines():
-            if line == '' or line == '\n':
-                continue
-            trajectory = literal_eval(line.strip('\n'))
-            if len(trajectory) <= 10:
-                continue
-            origin_dataSet.append(list(map(float, trajectory[0][1:3])))
-            destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
+    filename2 = "D:\haoc\data\TaxiData/trajectory/2014-10-21/trajectory_2014-10-21_result_npy.npy"
+    filename3 = "D:\haoc\data\TaxiData/trajectory/2014-10-22/trajectory_2014-10-22_result_npy.npy"
+    filename4 = "D:\haoc\data\TaxiData/trajectory/2014-10-23/trajectory_2014-10-23_result_npy.npy"
+    filename5 = "D:\haoc\data\TaxiData/trajectory/2014-10-24/trajectory_2014-10-24_result_npy.npy"
+    filename6 = "D:\haoc\data\TaxiData/trajectory/2014-10-25/trajectory_2014-10-25_result_npy.npy"
+    filename7 = "D:\haoc\data\TaxiData/trajectory/2014-10-26/trajectory_2014-10-26_result_npy.npy"
+
+    flag = True
+    trajectories = np.load(filename2).tolist()
+    for trajectory, label, time_slot, weekday in trajectories:
+        if len(trajectory) <= 10 and flag:
+            flag = not flag
+            continue
+        flag = not flag
+        origin_dataSet.append(list(map(float, trajectory[0][1:3])))
+        destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
+
+    trajectories = np.load(filename3).tolist()
+    for trajectory, label, time_slot, weekday in trajectories:
+        if len(trajectory) <= 10 and flag:
+            flag = not flag
+            continue
+        flag = not flag
+        origin_dataSet.append(list(map(float, trajectory[0][1:3])))
+        destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
+
+    trajectories = np.load(filename4).tolist()
+    for trajectory, label, time_slot, weekday in trajectories:
+        if len(trajectory) <= 10 and flag:
+            flag = not flag
+            continue
+        flag = not flag
+        origin_dataSet.append(list(map(float, trajectory[0][1:3])))
+        destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
+
+    trajectories = np.load(filename5).tolist()
+    for trajectory, label, time_slot, weekday in trajectories:
+        if len(trajectory) <= 10 and flag:
+            flag = not flag
+            continue
+        flag = not flag
+        origin_dataSet.append(list(map(float, trajectory[0][1:3])))
+        destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
+
+    trajectories = np.load(filename6).tolist()
+    for trajectory, label, time_slot, weekday in trajectories:
+        if len(trajectory) <= 10 and flag:
+            flag = not flag
+            continue
+        flag = not flag
+        origin_dataSet.append(list(map(float, trajectory[0][1:3])))
+        destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
+
+    trajectories = np.load(filename7).tolist()
+    for trajectory, label, time_slot, weekday in trajectories:
+        if len(trajectory) <= 10 and flag:
+            flag = not flag
+            continue
+        flag = not flag
+        origin_dataSet.append(list(map(float, trajectory[0][1:3])))
+        destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
 
     return origin_dataSet, destination_dataSet
 
@@ -57,11 +95,11 @@ def main():
     # print(clusters)
     # plotFeature(dataSet, clusters, clusterNum)
 
-    origin_dataset, destination_dataSet = load_dataset('F:\TaxiData/trajectory_taz/2014-10-22/youke_0')
+    origin_dataset, destination_dataSet = load_dataset('D:\haoc\data\TaxiData/trajectory/2014-10-20/trajectory_2014-10-20_result_npy.npy')
     origin_dataset_array = np.array(origin_dataset)
     destination_dataset_array = np.array(destination_dataSet)
-    origin_db = DBSCAN(eps=0.0002, min_samples=20, metric='haversine').fit(origin_dataset_array)
-    destination_db = DBSCAN(eps=0.0002, min_samples=20, metric='haversine').fit(destination_dataset_array)
+    origin_db = DBSCAN(eps=0.0002, min_samples=40, metric='haversine').fit(origin_dataset_array)
+    destination_db = DBSCAN(eps=0.0002, min_samples=40, metric='haversine').fit(destination_dataset_array)
 
     origin_labels = origin_db.labels_
     destination_labels = destination_db.labels_
@@ -97,8 +135,8 @@ def main():
     destination_new_dataset = np.array(destination_new_dataset)
     destination_dict_lables = Counter(destination_new_labels)
     print(destination_dict_lables)
-    np.save("F:\TaxiData\cluster\cluster_dataset", destination_new_dataset)
-    np.save("F:\TaxiData\cluster\destination_labels", destination_new_labels)
+    np.save("D:\haoc\data\TaxiData\cluster\cluster_dataset_new", destination_new_dataset)
+    np.save("D:\haoc\data\TaxiData\cluster\destination_labels_new", destination_new_labels)
 
 
     # single_class_dataset = []

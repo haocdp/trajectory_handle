@@ -1,12 +1,12 @@
 import numpy as np
 
 linux_path = "/root/taxiData"
-windows_path = "F:/TaxiData"
-base_path = windows_path
+windows_path = "D:\haoc\data\TaxiData"
+base_path = linux_path
 
 def get_cluster_center():
-    cluster_dataset = list(np.load(base_path + "/cluster/cluster_dataset.npy"))
-    labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
+    cluster_dataset = list(np.load(base_path + "/cluster/cluster_dataset_new.npy"))
+    labels = list(np.load(base_path + "/cluster/destination_labels_new.npy"))
     cluster_dict = {}
     for index, value in enumerate(labels):
         if value == -1:

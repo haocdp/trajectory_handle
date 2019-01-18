@@ -37,7 +37,7 @@ LAYER_NUM = 2
 
 linux_path = "/root/taxiData"
 windows_path = "D:\haoc\data\TaxiData"
-base_path = linux_path
+base_path = windows_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
