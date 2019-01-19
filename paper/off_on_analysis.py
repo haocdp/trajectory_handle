@@ -6,8 +6,8 @@ from datetime import datetime
 import numpy as np
 
 linux_path = "/root/taxiData"
-windows_path = "F:/TaxiData"
-base_path = windows_path + "/trajectory_without_filter/"
+windows_path = "H:/TaxiData"
+base_path = linux_path + "/trajectory_without_filter/"
 
 file_path1 = "2014-10-20"
 file_path2 = "2014-10-21"
@@ -39,15 +39,15 @@ for file_path in file_paths:
                 start_time = datetime.strptime(str(trajectory[0][3]), "%Y-%m-%d %H:%M:%S")
                 end_time = datetime.strptime(str(trajectory[-1][3]), "%Y-%m-%d %H:%M:%S")
 
-                xunke_time += (end_time - start_time).seconds
+                xunke_time += (end_time - start_time).seconds / 60
 
     youke_trajectories = np.load(youke).tolist()
     for trajectory in youke_trajectories:
         start_time = datetime.strptime(str(trajectory[0][3]), "%Y-%m-%d %H:%M:%S")
         end_time = datetime.strptime(str(trajectory[-1][3]), "%Y-%m-%d %H:%M:%S")
 
-        youke_time += (end_time - start_time).seconds
+        youke_time += (end_time - start_time).seconds / 60
 
-    print("")
+    print("day: {}, filexunke time: {}, youke time: {}".format(file_path, xunke_time, youke_time))
 
 
