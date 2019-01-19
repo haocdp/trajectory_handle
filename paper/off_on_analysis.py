@@ -5,6 +5,9 @@ from ast import literal_eval
 from datetime import datetime
 import numpy as np
 from trajectory.cal_distance import haversine
+import sys
+if sys.platform == 'linux':
+    sys.path.append('/root/trajectory_handle/')
 
 linux_path = "/root/taxiData"
 windows_path = "H:/TaxiData"
