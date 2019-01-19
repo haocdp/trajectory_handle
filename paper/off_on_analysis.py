@@ -4,6 +4,7 @@
 from ast import literal_eval
 from datetime import datetime
 import numpy as np
+from trajectory.cal_distance import haversine
 
 linux_path = "/root/taxiData"
 windows_path = "H:/TaxiData"
@@ -27,7 +28,9 @@ for file_path in file_paths:
     youke = base_path + file_path + "/trajectory_" + file_path + ".npy"
 
     xunke_time = 0.
+    xunke_distance = 0.
     youke_time = 0.
+    youke_distance = 0.
 
     for xunke_file in xunke:
         with open(xunke_file) as fr:
@@ -41,6 +44,13 @@ for file_path in file_paths:
 
                 xunke_time += (end_time - start_time).seconds / 60
 
+                start_lng = float(trajectory[0][1])
+                start_lat = float(trajectory[0][2])
+                end_lng = float(trajectory[-1][1])
+                end_lat = float(trajectory[-1][2])
+
+                xunke_distance += haversine(start_lng, start_lat, end_lng, end_lat)
+
     youke_trajectories = np.load(youke).tolist()
     for trajectory in youke_trajectories:
         start_time = datetime.strptime(str(trajectory[0][3]), "%Y-%m-%d %H:%M:%S")
@@ -48,6 +58,13 @@ for file_path in file_paths:
 
         youke_time += (end_time - start_time).seconds / 60
 
-    print("day: {}, filexunke time: {}, youke time: {}".format(file_path, xunke_time, youke_time))
+        start_lng = float(trajectory[0][1])
+        start_lat = float(trajectory[0][2])
+        end_lng = float(trajectory[-1][1])
+        end_lat = float(trajectory[-1][2])
+
+        youke_distance += haversine(start_lng, start_lat, end_lng, end_lat)
+
+    print("day: {}, xunke distance: {}, youke distance: {}, xunke time: {}, youke time: {}, ".format(file_path, xunke_distance, youke_distance, xunke_time, youke_time))
 
 
