@@ -34,7 +34,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
-EPOCH = 10  # train the training data n times, to save time, we just train 1 epoch
+EPOCH = 100  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 64
 TIME_STEP = 8  # rnn time step / image height
 INPUT_SIZE = 59  # rnn input size / image width
@@ -42,9 +42,15 @@ HIDDEN_SIZE = 256
 LR = 0.0001  # learning rate
 LAYER_NUM = 2
 
+car_embedding_num = 2
+poi_embedding_num = 4
+region_embedding_num = 8
+week_embedding_num = 2
+time_embedding_num = 4
+
 linux_path = "/root/taxiData"
 windows_path = "D:\haoc\data\TaxiData"
-base_path = windows_path
+base_path = linux_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
@@ -54,6 +60,13 @@ elogger = logger.Logger("CNN_LSTM_without_filter")
 min_lng, max_lng, min_lat, max_lat = list(np.load(base_path + "/demand/region_range.npy"))
 dis_lng = max_lng - min_lng
 dis_lat = max_lat - min_lat
+
+elogger.log("将车辆种类设为1，防止不同车辆的影响")
+print("将车辆种类设为1，防止不同车辆的影响")
+elogger.log("将日期只分为0-工作日，1-周末")
+print("将日期只分为0-工作日，1-周末")
+elogger.log("将时间以半个小时为间隔，共48个")
+print("将时间以半个小时为间隔，共48个")
 
 def load_data():
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
@@ -110,11 +123,15 @@ def load_data():
         new_tra = []
         for t in tra:
             new_t = []
-            new_t.append(car_to_ix[t[0]])
+            # new_t.append(car_to_ix[t[0]])
+            new_t.append(1)  # 固定车辆，防止影响
             new_t.append(region_to_ix[t[5]])
             new_t.append(poi_to_ix[t[6]])
-            new_t.append(weekday)
-            new_t.append(time_slot)
+            if weekday < 5:
+                new_t.append(0)
+            else:
+                new_t.append(1)
+            new_t.append(int(time_slot / 30))
             new_t.append((float(t[1]) - min_lng) / dis_lng)
             new_t.append((float(t[2]) - min_lat) / dis_lat)
             new_tra.append(new_t)
@@ -187,13 +204,13 @@ class RNN(nn.Module):
             nn.Linear(HIDDEN_SIZE, 512),
             nn.Linear(512, label_size)
         )
-        self.car_embeds = nn.Embedding(len(car_to_ix), 16)
-        self.poi_embeds = nn.Embedding(len(poi_to_ix), 4)
-        self.region_embeds = nn.Embedding(len(region_to_ix), 8)
-        self.week_embeds = nn.Embedding(7, 3)
-        self.time_embeds = nn.Embedding(1440, 8)
+        self.car_embeds = nn.Embedding(len(car_to_ix), car_embedding_num)
+        self.poi_embeds = nn.Embedding(len(poi_to_ix), poi_embedding_num)
+        self.region_embeds = nn.Embedding(len(region_to_ix), region_embedding_num)
+        self.week_embeds = nn.Embedding(2, week_embedding_num)
+        self.time_embeds = nn.Embedding(48, time_embedding_num)
 
-        self.region_poi_linear = nn.Linear(12, 32)
+        self.region_poi_linear = nn.Linear(region_embedding_num + poi_embedding_num - 2, 32)
         self.coord_linear = nn.Linear(2, 8)
         self.conv = GeoConv.Net()
 
@@ -252,12 +269,12 @@ class RNN(nn.Module):
                     embedding_vector = torch.cat((embedding_vector, self.week_embeds(torch.LongTensor([vector[0][3].item()]))[0]))
                     embedding_vector = torch.cat((embedding_vector, self.time_embeds(torch.LongTensor([vector[0][4].item()]))[0]))
 
-        new_vector = new_vector.view(-1, 10, 14)
+        new_vector = new_vector.view(-1, 10, region_embedding_num + poi_embedding_num)
         new_vector = torch.cat((self.region_poi_linear(new_vector[:, :, :-2]), self.coord_linear(new_vector[:, :, -2:])), 2)
         conv_vector = self.conv(new_vector)
 
         embedding_vector = F.tanh(embedding_vector)
-        embedding_vector = embedding_vector.view(-1, 27)
+        embedding_vector = embedding_vector.view(-1, car_embedding_num + week_embedding_num + time_embedding_num)
         embedding_vector = torch.unsqueeze(embedding_vector, dim=1)
         expand_embedding_vector = embedding_vector.expand(conv_vector.size()[:2] + (embedding_vector.size()[-1],))
         x = torch.cat((conv_vector, expand_embedding_vector), dim=2)
@@ -297,7 +314,7 @@ for epoch in range(EPOCH):
         optimizer.step()  # apply gradients
         del b_x, b_y
 
-        if step % 10000 == 0:
+        if step % 50000 == 0:
             all_pred_y = []
             all_test_y = []
             all_test_d = []
