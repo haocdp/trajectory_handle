@@ -37,7 +37,7 @@ gpu_avaliable = torch.cuda.is_available()
 EPOCH = 100  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 64
 TIME_STEP = 8  # rnn time step / image height
-INPUT_SIZE = 59  # rnn input size / image width
+INPUT_SIZE = 40  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.0001  # learning rate
 LAYER_NUM = 2
@@ -49,7 +49,7 @@ week_embedding_num = 2
 time_embedding_num = 4
 
 linux_path = "/root/taxiData"
-windows_path = "D:\haoc\data\TaxiData"
+windows_path = "K:\毕业论文\TaxiData"
 base_path = linux_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
@@ -61,12 +61,12 @@ min_lng, max_lng, min_lat, max_lat = list(np.load(base_path + "/demand/region_ra
 dis_lng = max_lng - min_lng
 dis_lat = max_lat - min_lat
 
-elogger.log("将车辆种类设为1，防止不同车辆的影响")
-print("将车辆种类设为1，防止不同车辆的影响")
-elogger.log("将日期只分为0-工作日，1-周末")
-print("将日期只分为0-工作日，1-周末")
-elogger.log("将时间以半个小时为间隔，共48个")
-print("将时间以半个小时为间隔，共48个")
+# elogger.log("将车辆种类设为1，防止不同车辆的影响")
+# print("将车辆种类设为1，防止不同车辆的影响")
+# elogger.log("将日期只分为0-工作日，1-周末")
+# print("将日期只分为0-工作日，1-周末")
+# elogger.log("将时间以半个小时为间隔，共48个")
+# print("将时间以半个小时为间隔，共48个")
 
 def load_data():
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
@@ -124,7 +124,7 @@ def load_data():
         for t in tra:
             new_t = []
             # new_t.append(car_to_ix[t[0]])
-            new_t.append(1)  # 固定车辆，防止影响
+            new_t.append(0)  # 固定车辆，防止影响
             new_t.append(region_to_ix[t[5]])
             new_t.append(poi_to_ix[t[6]])
             if weekday < 5:
@@ -204,13 +204,13 @@ class RNN(nn.Module):
             nn.Linear(HIDDEN_SIZE, 512),
             nn.Linear(512, label_size)
         )
-        self.car_embeds = nn.Embedding(len(car_to_ix), car_embedding_num)
+        self.car_embeds = nn.Embedding(1, car_embedding_num)
         self.poi_embeds = nn.Embedding(len(poi_to_ix), poi_embedding_num)
         self.region_embeds = nn.Embedding(len(region_to_ix), region_embedding_num)
         self.week_embeds = nn.Embedding(2, week_embedding_num)
         self.time_embeds = nn.Embedding(48, time_embedding_num)
 
-        self.region_poi_linear = nn.Linear(region_embedding_num + poi_embedding_num - 2, 32)
+        self.region_poi_linear = nn.Linear(region_embedding_num + poi_embedding_num, 32)
         self.coord_linear = nn.Linear(2, 8)
         self.conv = GeoConv.Net()
 
@@ -269,7 +269,7 @@ class RNN(nn.Module):
                     embedding_vector = torch.cat((embedding_vector, self.week_embeds(torch.LongTensor([vector[0][3].item()]))[0]))
                     embedding_vector = torch.cat((embedding_vector, self.time_embeds(torch.LongTensor([vector[0][4].item()]))[0]))
 
-        new_vector = new_vector.view(-1, 10, region_embedding_num + poi_embedding_num)
+        new_vector = new_vector.view(-1, 10, region_embedding_num + poi_embedding_num + 2)
         new_vector = torch.cat((self.region_poi_linear(new_vector[:, :, :-2]), self.coord_linear(new_vector[:, :, -2:])), 2)
         conv_vector = self.conv(new_vector)
 

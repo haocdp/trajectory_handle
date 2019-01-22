@@ -63,7 +63,7 @@ class TrainSet(Dataset):
 
 n = 30
 LR = 0.0001
-EPOCH = 100
+EPOCH = 50
 train_end = -500
 # 数据集建立
 df, df_all, df_index = readData('high', n=n, train_end=train_end)
@@ -99,6 +99,7 @@ for step in range(EPOCH):
     if step % 10:
         torch.save(rnn, 'rnn.pkl')
 torch.save(rnn, 'rnn.pkl')
+torch.save(rnn.state_dict(), 'params.pkl')
 #
 generate_data_train = []
 generate_data_test = []
@@ -124,3 +125,7 @@ plt.plot(df_index[train_end:-400], df_all[train_end:-400], label='real-data')
 plt.plot(df_index[train_end:-400], generate_data_test[:-400], label='generate_test')
 plt.legend()
 plt.show()
+
+
+model = torch.load('rnn.pkl')
+print(model)
