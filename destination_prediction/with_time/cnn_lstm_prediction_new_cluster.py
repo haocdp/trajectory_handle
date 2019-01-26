@@ -329,7 +329,7 @@ for epoch in range(EPOCH):
             print(print_out)
             elogger.log(str(print_out))
 
-            torch.save(rnn.state_dict(), 'cnn_lstm_prediction_new_cluster.pkl')
+torch.save(rnn.state_dict(), 'cnn_lstm_prediction_new_cluster.pkl')
 
 # print 10 predictions from test data
 # test_output = rnn(test_data[:10].view(-1, 10, 5))

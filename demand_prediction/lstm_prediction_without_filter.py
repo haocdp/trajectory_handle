@@ -35,7 +35,7 @@ REGION_NUM = 918
 SEQ_LENGTH = 6
 
 linux_path = "/root/taxiData"
-windows_path = "F:/TaxiData"
+windows_path = "K:\毕业论文\TaxiData"
 base_path = windows_path
 
 elogger = logger.Logger("demand_lstm_prediction")
@@ -218,6 +218,8 @@ for epoch in range(EPOCH):
                         '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_y)
             print(print_out)
             elogger.log(str(print_out))
+
+torch.save(rnn.state_dict(), 'params.pkl')
 
 # print 10 predictions from test data
 # test_output = rnn(test_data[:10].view(-1, 10, 5))
