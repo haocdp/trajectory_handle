@@ -1,57 +1,45 @@
 """
 统计所有载客轨迹在区域之间转移的时间，形成区域转移时间矩阵
 """
-import os
 import sys
-
 if sys.platform == 'linux':
     sys.path.append('/root/trajectory_handle/')
 
-import torch
-from torch import nn
-import torchvision.datasets as dsets
-import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
 import numpy as np
-import torch.utils.data as Data
-import torch.nn.functional as F
-import random
-import logger
 from datetime import datetime
-
 # torch.manual_seed(1)    # reproducible
 
 linux_path = "/root/taxiData"
 windows_path = "K:\毕业论文\TaxiData"
-base_path = windows_path
+base_path = linux_path
 
 
 def load_data():
     filepath1 = base_path + "/trajectory_without_filter/2014-10-20/trajectory_2014-10-20result_npy.npy"
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
-    # filepath2 = base_path + "/trajectory_without_filter/2014-10-21/trajectory_2014-10-21result_npy.npy"
-    # filepath3 = base_path + "/trajectory_without_filter/2014-10-22/trajectory_2014-10-22result_npy.npy"
-    # filepath4 = base_path + "/trajectory_without_filter/2014-10-23/trajectory_2014-10-23result_npy.npy"
-    # filepath5 = base_path + "/trajectory_without_filter/2014-10-24/trajectory_2014-10-24result_npy.npy"
-    # filepath6 = base_path + "/trajectory_without_filter/2014-10-25/trajectory_2014-10-25result_npy.npy"
-    # filepath7 = base_path + "/trajectory_without_filter/2014-10-26/trajectory_2014-10-26result_npy.npy"
+    filepath2 = base_path + "/trajectory_without_filter/2014-10-21/trajectory_2014-10-21result_npy.npy"
+    filepath3 = base_path + "/trajectory_without_filter/2014-10-22/trajectory_2014-10-22result_npy.npy"
+    filepath4 = base_path + "/trajectory_without_filter/2014-10-23/trajectory_2014-10-23result_npy.npy"
+    filepath5 = base_path + "/trajectory_without_filter/2014-10-24/trajectory_2014-10-24result_npy.npy"
+    filepath6 = base_path + "/trajectory_without_filter/2014-10-25/trajectory_2014-10-25result_npy.npy"
+    filepath7 = base_path + "/trajectory_without_filter/2014-10-26/trajectory_2014-10-26result_npy.npy"
 
     trajectories1 = list(np.load(filepath1))
-    # trajectories2 = list(np.load(filepath2))
-    # trajectories3 = list(np.load(filepath3))
-    # trajectories4 = list(np.load(filepath4))
-    # trajectories5 = list(np.load(filepath5))
-    # trajectories6 = list(np.load(filepath6))
-    # trajectories7 = list(np.load(filepath7))
+    trajectories2 = list(np.load(filepath2))
+    trajectories3 = list(np.load(filepath3))
+    trajectories4 = list(np.load(filepath4))
+    trajectories5 = list(np.load(filepath5))
+    trajectories6 = list(np.load(filepath6))
+    trajectories7 = list(np.load(filepath7))
 
     all_trajectories = []
     all_trajectories.extend(trajectories1)
-    # all_trajectories.extend(trajectories2)
-    # all_trajectories.extend(trajectories3)
-    # all_trajectories.extend(trajectories4)
-    # all_trajectories.extend(trajectories5)
-    # all_trajectories.extend(trajectories6)
-    # all_trajectories.extend(trajectories7)
+    all_trajectories.extend(trajectories2)
+    all_trajectories.extend(trajectories3)
+    all_trajectories.extend(trajectories4)
+    all_trajectories.extend(trajectories5)
+    all_trajectories.extend(trajectories6)
+    all_trajectories.extend(trajectories7)
 
     # 打乱
     # random.shuffle(all_trajectories)
@@ -72,8 +60,9 @@ def load_data():
     region_transtion_time = [[0. for j in range(0, 918)] for i in range(0, 918)]
     for row_ix, row in enumerate(region_transtion_times):
         for col_ix, col in enumerate(row):
-            region_transtion_time[row_ix][col_ix] = sum(region_transtion_times[row_ix][col_ix]) / \
-                                                    len(region_transtion_times[row_ix][col_ix])
+            if not len(region_transtion_times[row_ix][col_ix]) == 0:
+                region_transtion_time[row_ix][col_ix] = sum(region_transtion_times[row_ix][col_ix]) / \
+                                                        len(region_transtion_times[row_ix][col_ix])
     np.save("region_transition_time", region_transtion_time)
 
 
