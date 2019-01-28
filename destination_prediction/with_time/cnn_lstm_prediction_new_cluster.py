@@ -300,7 +300,7 @@ for epoch in range(EPOCH):
         optimizer.step()  # apply gradients
         del b_x, b_y
 
-        if step % 50000 == 0:
+        if step % 100000 == 0:
             all_pred_y = []
             all_test_y = []
             all_test_d = []
