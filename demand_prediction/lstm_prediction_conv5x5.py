@@ -14,7 +14,7 @@ import torch.nn.functional as F
 import random
 import logger
 from demand_prediction.evaluation.Evaluate import Evaluate
-# from demand_prediction.Demand_Conv import Net
+from demand_prediction.Demand_Conv_5x5 import Net
 
 # torch.manual_seed(1)    # reproducible
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # gpu
@@ -24,7 +24,7 @@ gpu_avaliable = torch.cuda.is_available()
 EPOCH = 100  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 128
 TIME_STEP = 6  # rnn time step / image height
-INPUT_SIZE = 16  # rnn input size / image width
+INPUT_SIZE = 19  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.0001  # learning rate
 LAYER_NUM = 2
@@ -38,7 +38,7 @@ windows_path = "K:\毕业论文\TaxiData"
 mac_path = "/Volumes/MyZone/毕业论文/TaxiData"
 base_path = mac_path
 
-elogger = logger.Logger("demand_lstm_prediction_only_temporal")
+elogger = logger.Logger("demand_lstm_prediction_conv5x5")
 
 
 def load_data():
@@ -66,8 +66,12 @@ def load_data():
             new_o.append(o[1])
             new_o.append(o[2])
             new_o.append(d)
-            for i in conv:
-                for j in i:
+            for row, i in enumerate(conv):
+                if not 1 <= row <= 5:
+                    continue
+                for col, j in enumerate(i):
+                    if not 1 <= col <= 5:
+                        continue
                     new_o.append(j)
             new_seq.append(new_o)
         return new_seq
@@ -127,10 +131,10 @@ class RNN(nn.Module):
         self.region_embeds = nn.Embedding(REGION_NUM, 8)
         self.week_embeds = nn.Embedding(WEEKDAY_NUM, 3)
         self.time_embeds = nn.Embedding(TIME_SLOT, 4)
-        # if gpu_avaliable:
-        #     self.conv = Net().cuda()
-        # else:
-        #     self.conv = Net()
+        if gpu_avaliable:
+            self.conv = Net().cuda()
+        else:
+            self.conv = Net()
 
         # self.fc = nn.Linear(HIDDEN_SIZE, 1)
         self.fc = nn.Sequential(
@@ -141,25 +145,25 @@ class RNN(nn.Module):
         )
 
     def forward(self, x):
-        # before_conv = []
-        # for batches in x:
-        #     for seqs in batches:
-        #         before_conv.extend(seqs[-49:].tolist())
-        # if gpu_avaliable:
-        #     before_conv = torch.cuda.FloatTensor(before_conv)
-        # else:
-        #     before_conv = torch.FloatTensor(before_conv)
-        # before_conv = before_conv.view(-1, SEQ_LENGTH, 7, 7)
-        #
-        # convs = None
-        # for item in torch.split(before_conv, 1, 1):
-        #     if convs is None:
-        #         convs = torch.unsqueeze(self.conv(item), 1)
-        #     else:
-        #         convs = torch.cat((convs, torch.unsqueeze(self.conv(item), 1)), 1)
+        before_conv = []
+        for batches in x:
+            for seqs in batches:
+                before_conv.extend(seqs[-25:].tolist())
+        if gpu_avaliable:
+            before_conv = torch.cuda.FloatTensor(before_conv)
+        else:
+            before_conv = torch.FloatTensor(before_conv)
+        before_conv = before_conv.view(-1, SEQ_LENGTH, 5, 5)
+
+        convs = None
+        for item in torch.split(before_conv, 1, 1):
+            if convs is None:
+                convs = torch.unsqueeze(self.conv(item), 1)
+            else:
+                convs = torch.cat((convs, torch.unsqueeze(self.conv(item), 1)), 1)
         new_x = torch.cat((self.week_embeds(x[:, :, 0]), self.time_embeds(x[:, :, 1])), 2)
         new_x = torch.cat((new_x, self.region_embeds(x[:, :, 2])), 2)
-        x = torch.cat((new_x, torch.FloatTensor(torch.unsqueeze(x[:, :, 3], 2).tolist())), 2)
+        x = torch.cat((new_x, convs), 2)
 
         if gpu_avaliable:
             x = x.cuda()
@@ -188,7 +192,7 @@ for epoch in range(EPOCH):
             b_x = b_x.cuda()
             b_y = b_y.cuda()
 
-        b_x = b_x.view(-1, TIME_STEP, 53)  # reshape x to (batch, time_step, input_size)
+        b_x = b_x.view(-1, TIME_STEP, 29)  # reshape x to (batch, time_step, input_size)
 
         output = rnn(b_x)  # rnn output
         loss = loss_func(output, b_y)  # cross entropy loss
@@ -205,7 +209,7 @@ for epoch in range(EPOCH):
                     t_x = t_x.cuda()
                     t_y = t_y.cuda()
 
-                t_x = t_x.view(-1, TIME_STEP, 53)
+                t_x = t_x.view(-1, TIME_STEP, 29)
                 test_output = rnn(t_x)  # (samples, time_step, input_size)
                 if gpu_avaliable:
                     pred_y = test_output.cuda().data
@@ -220,4 +224,3 @@ for epoch in range(EPOCH):
             elogger.log(str(print_out))
 
 # torch.save(rnn.state_dict(), 'params.pkl')
-
