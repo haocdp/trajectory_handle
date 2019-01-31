@@ -107,6 +107,9 @@ def load_data():
                 poi_to_ix[t[-1]] = len(poi_to_ix)
             if t[-2] not in region_to_ix:
                 region_to_ix[t[-2]] = len(region_to_ix)
+    np.save("trajectory_without_filter_car_to_ix", car_to_ix)
+    np.save("trajectory_without_filter_poi_to_ix", poi_to_ix)
+    np.save("trajectory_without_filter_region_to_ix", region_to_ix)
 
     def transfer(tra, weekday, time_slot):
         new_tra = []
