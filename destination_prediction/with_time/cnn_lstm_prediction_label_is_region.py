@@ -122,7 +122,7 @@ def load_data():
             new_t.append(time_slot)
             new_t.append((float(t[1]) - min_lng) / dis_lng)
             new_t.append((float(t[2]) - min_lat) / dis_lat)
-            new_t.append(t[5])
+            new_t.append(int(t[5]))
             new_tra.append(new_t)
         return new_tra
 
@@ -146,10 +146,10 @@ def load_data():
             continue
         if c < count:
             train_data.append(new_tra[:10])
-            train_labels.append(int(new_tra[-1][-1]))
+            train_labels.append(new_tra[-1][-1])
         else:
             test_data.append(new_tra[:10])
-            test_labels.append(int(new_tra[-1][-1]))
+            test_labels.append(new_tra[-1][-1])
             test_dest.append(list(map(float, trajectory[-1][1:3])))
         c += 1
     return train_data, train_labels, test_data, test_labels, test_dest, car_to_ix, poi_to_ix, region_to_ix
