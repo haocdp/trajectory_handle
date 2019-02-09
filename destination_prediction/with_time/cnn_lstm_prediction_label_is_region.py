@@ -217,24 +217,24 @@ class RNN(nn.Module):
                     if gpu_avaliable:
                         new_vector = torch.cat((self.region_embeds(torch.cuda.LongTensor([item[1].item()]))[0],
                                                 self.poi_embeds(torch.cuda.LongTensor([item[2].item()]))[0]))
+                        new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-3]])))
                         new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-2]])))
-                        new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-1]])))
                     else:
                         new_vector = torch.cat((self.region_embeds(torch.LongTensor([item[1].item()]))[0],
                                                 self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
+                        new_vector = torch.cat((new_vector, torch.FloatTensor([item[-3]])))
                         new_vector = torch.cat((new_vector, torch.FloatTensor([item[-2]])))
-                        new_vector = torch.cat((new_vector, torch.FloatTensor([item[-1]])))
                 else:
                     if gpu_avaliable:
                         new_vector = torch.cat((new_vector, self.region_embeds(torch.cuda.LongTensor([item[1].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.cuda.LongTensor([item[2].item()]))[0]))
+                        new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-3]])))
                         new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-2]])))
-                        new_vector = torch.cat((new_vector, torch.cuda.FloatTensor([item[-1]])))
                     else:
                         new_vector = torch.cat((new_vector, self.region_embeds(torch.LongTensor([item[1].item()]))[0]))
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
+                        new_vector = torch.cat((new_vector, torch.FloatTensor([item[-3]])))
                         new_vector = torch.cat((new_vector, torch.FloatTensor([item[-2]])))
-                        new_vector = torch.cat((new_vector, torch.FloatTensor([item[-1]])))
 
 
             if embedding_vector is None:
