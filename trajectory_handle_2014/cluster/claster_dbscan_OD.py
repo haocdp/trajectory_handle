@@ -10,6 +10,8 @@ from collections import Counter
 from ast import literal_eval
 
 
+file_path = "/Volumes/MyZone/毕业论文/TaxiData"
+
 def load_dataset(filename):
     origin_dataSet = []
     destination_dataSet = []
@@ -21,12 +23,12 @@ def load_dataset(filename):
         origin_dataSet.append(list(map(float, trajectory[0][1:3])))
         destination_dataSet.append(list(map(float, trajectory[-1][1:3])))
 
-    filename2 = "D:\haoc\data\TaxiData/trajectory/2014-10-21/trajectory_2014-10-21_result_npy.npy"
-    filename3 = "D:\haoc\data\TaxiData/trajectory/2014-10-22/trajectory_2014-10-22_result_npy.npy"
-    filename4 = "D:\haoc\data\TaxiData/trajectory/2014-10-23/trajectory_2014-10-23_result_npy.npy"
-    filename5 = "D:\haoc\data\TaxiData/trajectory/2014-10-24/trajectory_2014-10-24_result_npy.npy"
-    filename6 = "D:\haoc\data\TaxiData/trajectory/2014-10-25/trajectory_2014-10-25_result_npy.npy"
-    filename7 = "D:\haoc\data\TaxiData/trajectory/2014-10-26/trajectory_2014-10-26_result_npy.npy"
+    filename2 = file_path + "/trajectory/2014-10-21/trajectory_2014-10-21_result_npy.npy"
+    filename3 = file_path + "/trajectory/2014-10-22/trajectory_2014-10-22_result_npy.npy"
+    filename4 = file_path + "/trajectory/2014-10-23/trajectory_2014-10-23_result_npy.npy"
+    filename5 = file_path + "/trajectory/2014-10-24/trajectory_2014-10-24_result_npy.npy"
+    filename6 = file_path + "/trajectory/2014-10-25/trajectory_2014-10-25_result_npy.npy"
+    filename7 = file_path + "/trajectory/2014-10-26/trajectory_2014-10-26_result_npy.npy"
 
     flag = True
     trajectories = np.load(filename2).tolist()
@@ -95,7 +97,7 @@ def main():
     # print(clusters)
     # plotFeature(dataSet, clusters, clusterNum)
 
-    origin_dataset, destination_dataSet = load_dataset('D:\haoc\data\TaxiData/trajectory/2014-10-20/trajectory_2014-10-20_result_npy.npy')
+    origin_dataset, destination_dataSet = load_dataset(file_path + '/trajectory/2014-10-20/trajectory_2014-10-20_result_npy.npy')
     origin_dataset_array = np.array(origin_dataset)
     destination_dataset_array = np.array(destination_dataSet)
     origin_db = DBSCAN(eps=0.0002, min_samples=40, metric='haversine').fit(origin_dataset_array)
