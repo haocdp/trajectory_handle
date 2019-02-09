@@ -295,7 +295,7 @@ for epoch in range(EPOCH):
             b_x = b_x.cuda()
             b_y = b_y.cuda()
 
-        b_x = b_x.view(-1, 10, 7)  # reshape x to (batch, time_step, input_size)
+        b_x = b_x.view(-1, 10, 8)  # reshape x to (batch, time_step, input_size)
 
         output = rnn(b_x)  # rnn output
         loss = loss_func(output, b_y)  # cross entropy loss
@@ -314,7 +314,7 @@ for epoch in range(EPOCH):
                     t_y = t_y.cuda()
                     t_d = t_d.cuda()
 
-                t_x = t_x.view(-1, 10, 7)
+                t_x = t_x.view(-1, 10, 8)
                 test_output = rnn(t_x)  # (samples, time_step, input_size)
                 if gpu_avaliable:
                     pred_y = torch.max(test_output, 1)[1].cuda().data
