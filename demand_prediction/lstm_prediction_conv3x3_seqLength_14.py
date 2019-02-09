@@ -23,7 +23,7 @@ gpu_avaliable = torch.cuda.is_available()
 # Hyper Parameters
 EPOCH = 100  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 128
-TIME_STEP = 12  # rnn time step / image height
+TIME_STEP = 14  # rnn time step / image height
 INPUT_SIZE = 19  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.0001  # learning rate
@@ -31,7 +31,7 @@ LAYER_NUM = 2
 WEEKDAY_NUM = 7
 TIME_SLOT = 48
 REGION_NUM = 918
-SEQ_LENGTH = 12
+SEQ_LENGTH = 14
 
 linux_path = "/root/taxiData"
 windows_path = "K:\毕业论文\TaxiData"
