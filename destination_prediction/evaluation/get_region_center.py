@@ -11,7 +11,7 @@ def get_region_center():
 
     for line in lines:
         region, cord = line.split(" ")
-        region = int(region[0].split("_")[-1])
+        region = int(region.split("_")[-1])
         cord = cord.split(";")
         center_lng = (float(cord[0]) + float(cord[1])) / 2
         center_lat = (float(cord[2]) + float(cord[3])) / 2
