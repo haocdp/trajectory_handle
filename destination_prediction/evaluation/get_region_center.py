@@ -1,6 +1,6 @@
 linux_path = "/root/taxiData"
-windows_path = "D:\haoc\data\TaxiData"
-base_path = linux_path
+windows_path = "H:\TaxiData"
+base_path = windows_path
 
 def get_region_center():
     file_path = base_path + "/shenzhen_map/taz.txt"

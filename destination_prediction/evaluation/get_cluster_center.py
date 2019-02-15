@@ -1,8 +1,8 @@
 import numpy as np
 
 linux_path = "/root/taxiData"
-windows_path = "D:\haoc\data\TaxiData"
-base_path = linux_path
+windows_path = "H:\TaxiData"
+base_path = windows_path
 
 def get_cluster_center():
     cluster_dataset = list(np.load(base_path + "/cluster/cluster_dataset_new.npy"))
