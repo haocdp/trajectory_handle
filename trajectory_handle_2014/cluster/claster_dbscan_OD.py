@@ -10,7 +10,7 @@ from collections import Counter
 from ast import literal_eval
 
 
-file_path = "/Volumes/MyZone/毕业论文/TaxiData"
+file_path = "H:/TaxiData"
 
 def load_dataset(filename):
     origin_dataSet = []

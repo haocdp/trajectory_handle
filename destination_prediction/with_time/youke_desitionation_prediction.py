@@ -150,3 +150,4 @@ model = RNN()
 model.load_state_dict(torch.load('cnn_lstm_prediction_new_cluster.pkl'))
 
 youke_trajectories = np.load("youke_trajectories_data.npy").tolist()
+
