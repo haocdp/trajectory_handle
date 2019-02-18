@@ -60,7 +60,7 @@ dispatcher_trajectory = []
 youke = base_path + file_path + "/trajectory_2014-10-22result_npy.npy"
 youke_trajectories = np.load(youke).tolist()
 for trajectory, label, weekday, time_slot in youke_trajectories:
-    if you_start_time < datetime.strptime(trajectory[0][3], "%Y-%m-%d %H:%M:%S") < you_end_time:
+    if you_start_time < datetime.strptime(trajectory[0][3], "%Y-%m-%d %H:%M:%S") < you_end_time < datetime.strptime(trajectory[-1][3], "%Y-%m-%d %H:%M:%S"):
         dispatcher_trajectory.append((trajectory, label, weekday, time_slot))
 
 np.save("youke_trajectories_data", dispatcher_trajectory)

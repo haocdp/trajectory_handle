@@ -19,6 +19,9 @@ import random
 from destination_prediction.with_time import GeoConv
 import logger
 from destination_prediction.evaluation import get_cluster_center
+from datetime import datetime
+from datetime import timedelta
+import time
 
 # torch.manual_seed(1)    # reproducible
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
@@ -221,31 +224,39 @@ def label_to_region(label):
 youke_test_data = []
 youke_test_labels = []
 youke_test_first_region = []
+youke_test_first_time = []
 for trajectory, label, weekday, time_slot in youke_trajectories:
     new_tra = transfer(trajectory, weekday, time_slot)
     # new_tra = filter(new_tra)
     youke_test_data.append(new_tra[:10])
     youke_test_labels.append(label)
     youke_test_first_region.append(new_tra[0][-1])
+    youke_test_first_time.append(time.mktime(time.strptime(trajectory[0][3], "%Y-%m-%d %H:%M:%S")))
 
 test_data = torch.FloatTensor(youke_test_data)
 test_labels = torch.LongTensor(youke_test_labels)
 test_first_region = torch.LongTensor(youke_test_first_region)
+test_first_time = torch.FloatTensor(youke_test_first_time)
 
-test_dataset = Data.TensorDataset(test_data, test_labels, test_first_region)
+test_dataset = Data.TensorDataset(test_data, test_labels, test_first_region, test_first_time)
 test_loader = Data.DataLoader(
     dataset=test_dataset,
     batch_size=BATCH_SIZE,
     shuffle=True
 )
 
+"""
+判断载客轨迹的到达目的地时间是否落在6：30~7：00之间，如果在则加入数组，否则剔除
+"""
 all_pred_y = []
 all_pred_time = []
-for t_step, (t_x, t_y, t_f_r) in enumerate(test_loader):
+for t_step, (t_x, t_y, t_f_r, t_f_t) in enumerate(test_loader):
     if gpu_avaliable:
         t_x = t_x.cuda()
         t_y = t_y.cuda()
         t_f_r = t_f_r.cuda()
+        t_f_t = t_f_t.cuda()
+
 
     t_x = t_x.view(-1, 10, 8)
     test_output = model(t_x)  # (samples, time_step, input_size)
@@ -263,11 +274,21 @@ for t_step, (t_x, t_y, t_f_r) in enumerate(test_loader):
                 end_region_ix = region_to_matrix[pred_region]
                 grid_distance = abs(end_region_ix[0] - start_region_ix[0]) \
                                 + abs(end_region_ix[1] - start_region_ix[1])
-                if grid_distance < 6:
+                arrive_time = datetime.strptime(
+                    time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t_f_t[ix].item())),
+                    "%Y-%m-%d %H:%M:%S")\
+                              + timedelta(minutes=grid_distance * 5)
+                if datetime.strptime("2014-10-22 18:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
+                        datetime.strptime("2014-10-22 19:00:00", "%Y-%m-%d %H:%M:%S"):
                     all_pred_y.append(pred_region)
                     all_pred_time.append(grid_distance * 5)
             else:
-                if int(pred_time / 60) <= 30:
+                arrive_time = datetime.strptime(
+                    time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t_f_t[ix].item())),
+                    "%Y-%m-%d %H:%M:%S")\
+                              + timedelta(seconds=pred_time)
+                if datetime.strptime("2014-10-22 18:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
+                        datetime.strptime("2014-10-22 19:00:00", "%Y-%m-%d %H:%M:%S"):
                     all_pred_y.append(pred_region)
                     all_pred_time.append(int(pred_time / 60))
 
