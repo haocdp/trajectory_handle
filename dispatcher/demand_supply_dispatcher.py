@@ -9,14 +9,14 @@
 import numpy as np
 
 # 区域需求分布
-region_demand_distribution = np.load("../demand_prediction/region_prediction_distribution.npy").item()
+region_demand_distribution = np.load("../demand_prediction/region_prediction_distribution_9am.npy").item()
 region_demand_nums = 0.
 for key in region_demand_distribution.keys():
     region_demand_nums += region_demand_distribution[key]
 print("region_demand_nums = {}".format(region_demand_nums))
 
 # 区域空载出租车分布
-region_taxi_distribution = np.load("../destination_prediction/with_time/region_taxi_distribution.npy").item()
+region_taxi_distribution = np.load("../destination_prediction/with_time/region_taxi_distribution_9am.npy").item()
 region_taxi_nums = 0.
 for key in region_taxi_distribution.keys():
     if region_taxi_distribution[key] < 10:
@@ -25,7 +25,7 @@ for key in region_taxi_distribution.keys():
 print("region_taxi_nums = {}".format(region_taxi_nums))
 
 # 载客出租车目的地分布
-youke_destination_distribution = np.load("../destination_prediction/with_time/youke_destination_distribution.npy").item()
+youke_destination_distribution = np.load("../destination_prediction/with_time/youke_destination_distribution_9am.npy").item()
 youke_destination_nums = 0.
 for key in youke_destination_distribution.keys():
     youke_destination_nums += youke_destination_distribution[key]
@@ -52,8 +52,8 @@ for region in range(0, 918):
 
     demand_supply[region] = region_taxi_num - (region_demand_num - youke_destination_num)
     demand_supply_without_destination_prediction[region] = region_taxi_num - region_demand_num
-np.save("demand_supply", demand_supply)
-np.save("demand_supply_without_destination_prediction", demand_supply_without_destination_prediction)
+np.save("demand_supply_9am", demand_supply)
+np.save("demand_supply_without_destination_prediction_9am", demand_supply_without_destination_prediction)
 
 """
 将区域需求供给数据进行压缩，过滤掉为0的区域
@@ -73,9 +73,9 @@ for key in demand_supply.keys():
         demand_supply_new_ix[i] = demand_supply[key]
         i += 1
 
-np.save("region_to_new_ix", region_to_new_ix)
-np.save("new_ix_to_region", new_ix_to_region)
-np.save("demand_supply_new_ix", demand_supply_new_ix)
+np.save("region_to_new_ix_9am", region_to_new_ix)
+np.save("new_ix_to_region_9am", new_ix_to_region)
+np.save("demand_supply_new_ix_9am", demand_supply_new_ix)
 
 """
 不考虑目的地预测情况下的数据
@@ -92,8 +92,8 @@ for key in demand_supply_without_destination_prediction.keys():
         demand_supply_new_ix_without_destination_prediction[i] = demand_supply_without_destination_prediction[key]
         i += 1
 
-np.save("region_to_new_ix_without_destination_prediction", region_to_new_ix_without_destination_prediction)
-np.save("new_ix_to_region_without_destination_prediction", new_ix_to_region_without_destination_prediction)
-np.save("demand_supply_new_ix_without_destination_prediction", demand_supply_new_ix_without_destination_prediction)
+np.save("region_to_new_ix_without_destination_prediction_9am", region_to_new_ix_without_destination_prediction)
+np.save("new_ix_to_region_without_destination_prediction_9am", new_ix_to_region_without_destination_prediction)
+np.save("demand_supply_new_ix_without_destination_prediction_9am", demand_supply_new_ix_without_destination_prediction)
 
 

@@ -32,7 +32,7 @@ import logger
 from destination_prediction.evaluation.Evaluate import Evaluate
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters

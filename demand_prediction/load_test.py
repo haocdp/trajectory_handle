@@ -84,7 +84,7 @@ class RNN(nn.Module):
 model = RNN()
 model.load_state_dict(torch.load('params.pkl'))
 
-dispatcher_data = np.load("K:\毕业论文\TaxiData\demand\dispatcher_data.npy").tolist()
+dispatcher_data = np.load("K:\毕业论文\TaxiData\demand\dispatcher_data_1pm.npy").tolist()
 
 
 def flatten(o):
@@ -147,5 +147,5 @@ for t_step, (t_x, t_y) in enumerate(test_loader):
         else:
             region_prediction_dict[x[0][2].item()] = round(test_output[i].item())
 
-np.save("region_prediction_distribution", region_prediction_dict)
+np.save("region_prediction_distribution_1pm", region_prediction_dict)
 
