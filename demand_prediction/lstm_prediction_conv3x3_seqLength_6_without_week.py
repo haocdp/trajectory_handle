@@ -63,10 +63,10 @@ def load_data():
         for d, conv in o[3]:
             new_o = []
             # new_o.append(o[0])
-            if o[0] < 5:
-                new_o.append(0)
-            else:
-                new_o.append(1)
+            """
+                将每周天数置为0， 消除影响
+            """
+            new_o.append(0)
             new_o.append(o[1])
             new_o.append(o[2])
             new_o.append(d)
