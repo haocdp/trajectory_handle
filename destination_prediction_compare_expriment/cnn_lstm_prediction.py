@@ -32,7 +32,7 @@ import logger
 from destination_prediction.evaluation.Evaluate import Evaluate
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
@@ -46,7 +46,7 @@ LAYER_NUM = 2
 
 linux_path = "/root/taxiData"
 windows_path = "K:/毕业论文/TaxiData"
-base_path = windows_path
+base_path = linux_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels_new.npy"))
 # label个数
