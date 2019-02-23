@@ -10,12 +10,12 @@ import time
 最后得到的是轨迹序列和轨迹最终的目的地
 """
 
-windows_path = "D:\haoc\data/TaxiData"
+windows_path = "K:/毕业论文/TaxiData"
 linux_path = "/root/taxiData"
-base_path = linux_path
+base_path = windows_path
 
 file_path = "2014-10-24"
-dir_path = "/trajectory_without_filter/"
+dir_path = "/trajectory_simplified/"
 
 
 # 加载聚类数据
@@ -125,12 +125,12 @@ def classify_point(filepath, result_filepath):
         if count % 1000 == 0:
             print("has finish: {} %".format(float(count) / all_count * 100))
     result.close()
-    np.save(base_path + dir_path + file_path + "/trajectory_" + file_path + "_result_new_cluster", trajectories)
+    np.save(base_path + dir_path + file_path + "/trajectory_" + file_path + "_result", trajectories)
 
 
 def run():
     filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + ".npy"
-    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result_new_cluster"
+    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
     classify_point(filepath, result_filepath)
 
 
@@ -138,7 +138,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
     filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + ".npy"
-    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result_new_cluster"
+    result_filepath = base_path + dir_path + file_path + "/trajectory_" + file_path + "_result"
     classify_point(filepath, result_filepath)
 
 

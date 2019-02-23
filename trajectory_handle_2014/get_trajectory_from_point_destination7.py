@@ -13,7 +13,7 @@ import sys
 import os
 import numpy as np
 
-windows_path = "F:/TaxiData"
+windows_path = "K:/毕业论文/TaxiData"
 linux_path = "/root/taxiData"
 base_path = windows_path
 
@@ -21,7 +21,7 @@ file_dir = "2014-10-26"
 
 
 def get_weekday_trajectory(path):
-    save_path = base_path + "/trajectory/" + file_dir
+    save_path = base_path + "/trajectory_simplified/" + file_dir
 
     file_youke_0 = open(save_path + "/youke_0", "w")
     file_youke_1 = open(save_path + "/youke_1", "w")
@@ -166,7 +166,7 @@ def get_weekday_trajectory(path):
 
 
 def run():
-    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + ".npy"
+    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + "_simplified.npy"
     # weekend_path = "F:\FCD data\\trajectory\weekend"
     get_weekday_trajectory(npy_path)
 
@@ -174,7 +174,7 @@ def run():
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + ".npy"
+    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + "_simplified.npy"
     # weekend_path = "F:\FCD data\\trajectory\weekend"
     get_weekday_trajectory(npy_path)
 
