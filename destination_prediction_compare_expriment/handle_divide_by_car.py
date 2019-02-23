@@ -23,6 +23,7 @@ for key in trajectories_by_car.keys():
     new_trajectories[key] = trajectories_by_car[key]
 
 np.save(base_path + "/divide_by_taxi/car_trajectory_2014-10-20_simplified", new_trajectories)
+print("got 2014-10-20")
 
 trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-10-21.npy").item()
 
@@ -32,6 +33,7 @@ for key in taxi_ids:
         new_trajectories[key] = trajectories_by_car[key]
 
 np.save(base_path + "/divide_by_taxi/car_trajectory_2014-10-21_simplified", new_trajectories)
+print("got 2014-10-21")
 
 trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-10-22.npy").item()
 
@@ -41,6 +43,7 @@ for key in taxi_ids:
         new_trajectories[key] = trajectories_by_car[key]
 
 np.save(base_path + "/divide_by_taxi/car_trajectory_2014-10-22_simplified", new_trajectories)
+print("got 2014-10-22")
 
 trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-10-23.npy").item()
 
@@ -50,6 +53,7 @@ for key in taxi_ids:
         new_trajectories[key] = trajectories_by_car[key]
 
 np.save(base_path + "/divide_by_taxi/car_trajectory_2014-10-23_simplified", new_trajectories)
+print("got 2014-10-23")
 
 trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-10-24.npy").item()
 
@@ -59,6 +63,7 @@ for key in taxi_ids:
         new_trajectories[key] = trajectories_by_car[key]
 
 np.save(base_path + "/divide_by_taxi/car_trajectory_2014-10-24_simplified", new_trajectories)
+print("got 2014-10-24")
 
 trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-10-25.npy").item()
 
@@ -68,6 +73,7 @@ for key in taxi_ids:
         new_trajectories[key] = trajectories_by_car[key]
 
 np.save(base_path + "/divide_by_taxi/car_trajectory_2014-10-25_simplified", new_trajectories)
+print("got 2014-10-25")
 
 trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-10-26.npy").item()
 
@@ -77,6 +83,7 @@ for key in taxi_ids:
         new_trajectories[key] = trajectories_by_car[key]
 
 np.save(base_path + "/divide_by_taxi/car_trajectory_2014-10-26_simplified", new_trajectories)
+print("got 2014-10-26")
 
 
 
