@@ -20,6 +20,7 @@ def load_dataset(filename):
     file = csv.reader(open(file_path + "/train.csv", 'r'))
 
     flag = False
+    count = 0
     for line in file:
         if not flag:
             flag = not flag
@@ -27,9 +28,8 @@ def load_dataset(filename):
         if line == 'True':
             continue
         trajectory = literal_eval(line[-1])
-        if len(trajectory) >= 10:
+        if len(trajectory) >= 10 and count % 5 == 0:
             destination_dataSet.append(trajectory[-1])
-        flag = not flag
 
     return destination_dataSet
 
@@ -56,20 +56,19 @@ def main():
     destination_new_dataset = np.array(destination_new_dataset)
     destination_dict_lables = Counter(destination_new_labels)
     print(destination_dict_lables)
-    np.save(file_path + "/cluster\cluster_dataset", destination_new_dataset)
-    np.save(file_path + "/cluster\destination_labels", destination_new_labels)
+    np.save(file_path + "/cluster/cluster_dataset", destination_new_dataset)
+    np.save(file_path + "/cluster/destination_labels", destination_new_labels)
 
     n_clusters_ = len(set(destination_labels)) - (1 if -1 in destination_labels else 0)
 
     print('Estimated number of destination clusters: %d' % n_clusters_)
-
-    import pylab
-    # plt.figure()
-    # plt.scatter(destination_new_dataset[:, 0], destination_new_dataset[:, 1], c=destination_new_labels, s=10, cmap='seismic')
-    # plt.title('destination cluster')
-    # plt.show()
-    pylab.scatter(destination_new_dataset[:, 0], destination_new_dataset[:, 1], c=destination_new_labels, s=10, cmap='seismic')
-    pylab.savefig('cluster', format='pdf')
+    # import pylab
+    # # plt.figure()
+    # # plt.scatter(destination_new_dataset[:, 0], destination_new_dataset[:, 1], c=destination_new_labels, s=10, cmap='seismic')
+    # # plt.title('destination cluster')
+    # # plt.show()
+    # pylab.scatter(destination_new_dataset[:, 0], destination_new_dataset[:, 1], c=destination_new_labels, s=10, cmap='seismic')
+    # pylab.savefig('cluster', format='pdf')
 
 
 if __name__ == '__main__':
