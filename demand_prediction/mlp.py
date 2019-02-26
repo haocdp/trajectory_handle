@@ -8,13 +8,14 @@ import torch
 from torch import nn
 import torchvision.datasets as dsets
 import torchvision.transforms as transforms
+import matplotlib.pyplot as plt
 import numpy as np
 import torch.utils.data as Data
 import torch.nn.functional as F
 import random
 import logger
 from demand_prediction.evaluation.Evaluate import Evaluate
-# from demand_prediction.Demand_Conv import Net
+from demand_prediction.Demand_Conv import Net
 
 # torch.manual_seed(1)    # reproducible
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # gpu
@@ -24,7 +25,7 @@ gpu_avaliable = torch.cuda.is_available()
 EPOCH = 100  # train the training data n times, to save time, we just train 1 epoch
 BATCH_SIZE = 128
 TIME_STEP = 6  # rnn time step / image height
-INPUT_SIZE = 16  # rnn input size / image width
+INPUT_SIZE = 47  # rnn input size / image width
 HIDDEN_SIZE = 256
 LR = 0.0001  # learning rate
 LAYER_NUM = 2
@@ -34,11 +35,10 @@ REGION_NUM = 918
 SEQ_LENGTH = 6
 
 linux_path = "/root/taxiData"
-windows_path = "K:\毕业论文\TaxiData"
-mac_path = "/Volumes/MyZone/毕业论文/TaxiData"
+windows_path = "F:/TaxiData"
 base_path = windows_path
 
-elogger = logger.Logger("demand_lstm_prediction_only_temporal")
+elogger = logger.Logger("MLP")
 
 
 def load_data():
@@ -112,25 +112,25 @@ test_loader = Data.DataLoader(
 )
 
 
-class RNN(nn.Module):
+class MLP(nn.Module):
     def __init__(self):
-        super(RNN, self).__init__()
+        super(MLP, self).__init__()
 
-        self.rnn = nn.LSTM(  # if use nn.RNN(), it hardly learns
-            input_size=INPUT_SIZE,
-            hidden_size=HIDDEN_SIZE,  # rnn hidden unit
-            num_layers=LAYER_NUM,  # number of rnn layer
-            batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
-        )
+        # self.rnn = nn.LSTM(  # if use nn.RNN(), it hardly learns
+        #     input_size=INPUT_SIZE,
+        #     hidden_size=HIDDEN_SIZE,  # rnn hidden unit
+        #     num_layers=LAYER_NUM,  # number of rnn layer
+        #     batch_first=True,  # input & output will has batch size as 1s dimension. e.g. (batch, time_step, input_size)
+        # )
 
         # self.out = nn.Linear(HIDDEN_SIZE, label_size)
         self.region_embeds = nn.Embedding(REGION_NUM, 8)
         self.week_embeds = nn.Embedding(WEEKDAY_NUM, 3)
         self.time_embeds = nn.Embedding(TIME_SLOT, 4)
-        # if gpu_avaliable:
-        #     self.conv = Net().cuda()
-        # else:
-        #     self.conv = Net()
+        if gpu_avaliable:
+            self.conv = Net().cuda()
+        else:
+            self.conv = Net()
 
         # self.fc = nn.Linear(HIDDEN_SIZE, 1)
         self.fc = nn.Sequential(
@@ -141,25 +141,25 @@ class RNN(nn.Module):
         )
 
     def forward(self, x):
-        # before_conv = []
-        # for batches in x:
-        #     for seqs in batches:
-        #         before_conv.extend(seqs[-49:].tolist())
-        # if gpu_avaliable:
-        #     before_conv = torch.cuda.FloatTensor(before_conv)
-        # else:
-        #     before_conv = torch.FloatTensor(before_conv)
-        # before_conv = before_conv.view(-1, SEQ_LENGTH, 7, 7)
-        #
-        # convs = None
-        # for item in torch.split(before_conv, 1, 1):
-        #     if convs is None:
-        #         convs = torch.unsqueeze(self.conv(item), 1)
-        #     else:
-        #         convs = torch.cat((convs, torch.unsqueeze(self.conv(item), 1)), 1)
+        before_conv = []
+        for batches in x:
+            for seqs in batches:
+                before_conv.extend(seqs[-49:].tolist())
+        if gpu_avaliable:
+            before_conv = torch.cuda.FloatTensor(before_conv)
+        else:
+            before_conv = torch.FloatTensor(before_conv)
+        before_conv = before_conv.view(-1, SEQ_LENGTH, 7, 7)
+
+        convs = None
+        for item in torch.split(before_conv, 1, 1):
+            if convs is None:
+                convs = torch.unsqueeze(self.conv(item), 1)
+            else:
+                convs = torch.cat((convs, torch.unsqueeze(self.conv(item), 1)), 1)
         new_x = torch.cat((self.week_embeds(x[:, :, 0]), self.time_embeds(x[:, :, 1])), 2)
         new_x = torch.cat((new_x, self.region_embeds(x[:, :, 2])), 2)
-        x = torch.cat((new_x, torch.FloatTensor(torch.unsqueeze(x[:, :, 3], 2).tolist())), 2)
+        x = torch.cat((new_x, convs), 2)
 
         if gpu_avaliable:
             x = x.cuda()
@@ -219,5 +219,11 @@ for epoch in range(EPOCH):
             print(print_out)
             elogger.log(str(print_out))
 
-# torch.save(rnn.state_dict(), 'params.pkl')
-
+# print 10 predictions from test data
+# test_output = rnn(test_data[:10].view(-1, 10, 5))
+# if gpu_avaliable:
+#     pred_y = torch.max(test_output, 1)[1].cuda().data
+# else:
+#     pred_y = torch.max(test_output, 1)[1].data.numpy()
+# print(pred_y, 'prediction number')
+# print(test_labels[:10], 'real number')
