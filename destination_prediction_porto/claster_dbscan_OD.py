@@ -12,7 +12,7 @@ import csv
 
 linux_path = "/root/TaxiData_Porto"
 window_path = "K:/毕业论文/TaxiData_Porto"
-file_path = linux_path
+file_path = window_path
 
 def load_dataset(filename):
     destination_dataSet = []
