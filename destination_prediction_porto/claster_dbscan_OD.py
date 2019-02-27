@@ -25,11 +25,12 @@ def load_dataset(filename):
         if not flag:
             flag = not flag
             continue
-        if line == 'True':
+        if line[-2] == 'True':
             continue
         trajectory = literal_eval(line[-1])
         if len(trajectory) >= 10 and count % 5 == 0:
             destination_dataSet.append(trajectory[-1])
+        count += 1
 
     return destination_dataSet
 
