@@ -20,19 +20,16 @@ if sys.platform == 'linux':
 import os
 import torch
 from torch import nn
-import torchvision.datasets as dsets
-import torchvision.transforms as transforms
-import matplotlib.pyplot as plt
 import numpy as np
 import torch.utils.data as Data
 import torch.nn.functional as F
 import random
 from destination_prediction.with_time import GeoConv
 import logger
-from destination_prediction.evaluation.Evaluate import Evaluate
+from destination_prediction_porto.evaluation.Evaluate import Evaluate
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "3"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
@@ -53,42 +50,25 @@ labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 label_size = len(set(labels))
 elogger = logger.Logger("cnn_lstm_prediction_porto")
 
-min_lng, max_lng, min_lat, max_lat = list(np.load(base_path + "/demand/region_range.npy"))
+max_lng = -8.55
+min_lng = -8.70
+max_lat = 41.25
+min_lat = 41.
 dis_lng = max_lng - min_lng
 dis_lat = max_lat - min_lat
 
+
 def load_data():
-    # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
-    filepath1 = base_path + "/trajectory_without_filter/2014-10-20/trajectory_2014-10-20_result_new_cluster.npy"
-    filepath2 = base_path + "/trajectory_without_filter/2014-10-21/trajectory_2014-10-21_result_new_cluster.npy"
-    filepath3 = base_path + "/trajectory_without_filter/2014-10-22/trajectory_2014-10-22_result_new_cluster.npy"
-    filepath4 = base_path + "/trajectory_without_filter/2014-10-23/trajectory_2014-10-23_result_new_cluster.npy"
-    filepath5 = base_path + "/trajectory_without_filter/2014-10-24/trajectory_2014-10-24_result_new_cluster.npy"
-    filepath6 = base_path + "/trajectory_without_filter/2014-10-25/trajectory_2014-10-25_result_new_cluster.npy"
-    filepath7 = base_path + "/trajectory_without_filter/2014-10-26/trajectory_2014-10-26_result_new_cluster.npy"
+    filepath = base_path + "/trajectory_result.npy"
+    test_filepath = base_path + '/test_trajectory_result.npy'
 
-    trajectories1 = list(np.load(filepath1))
-    trajectories2 = list(np.load(filepath2))
-    trajectories3 = list(np.load(filepath3))
-    trajectories4 = list(np.load(filepath4))
-    trajectories5 = list(np.load(filepath5))
-    trajectories6 = list(np.load(filepath6))
-    trajectories7 = list(np.load(filepath7))
-
-    all_trajectories = []
-    all_trajectories.extend(trajectories1)
-    all_trajectories.extend(trajectories2)
-    all_trajectories.extend(trajectories3)
-    all_trajectories.extend(trajectories4)
-    all_trajectories.extend(trajectories5)
-    all_trajectories.extend(trajectories6)
-    all_trajectories.extend(trajectories7)
+    trajectories = list(np.load(filepath))
+    test_trajectories = list(np.load(test_filepath))
 
     # 打乱
-    random.shuffle(all_trajectories)
+    random.shuffle(trajectories)
 
-    print("all trajectories num : {}".format(len(all_trajectories)))
-    count = len(all_trajectories) * 0.8
+    print("all trajectories num : {}".format(len(trajectories)))
 
     train_data = []
     train_labels = []
@@ -99,7 +79,16 @@ def load_data():
     car_to_ix = {}
     poi_to_ix = {}
     region_to_ix = {}
-    for trajectory, label, weekday, time_slot in all_trajectories:
+    for trajectory, label, weekday, time_slot in trajectories:
+        for t in trajectory:
+            if t[0] not in car_to_ix:
+                car_to_ix[t[0]] = len(car_to_ix)
+            if t[-1] not in poi_to_ix:
+                poi_to_ix[t[-1]] = len(poi_to_ix)
+            if t[-2] not in region_to_ix:
+                region_to_ix[t[-2]] = len(region_to_ix)
+
+    for trajectory, label, weekday, time_slot in test_trajectories:
         for t in trajectory:
             if t[0] not in car_to_ix:
                 car_to_ix[t[0]] = len(car_to_ix)
@@ -125,32 +114,27 @@ def load_data():
             new_tra.append(new_t)
         return new_tra
 
-    # 过滤轨迹，如果轨迹存在连续相同区域，则进行过滤
-    def filter(tra):
-        first_index = tra[0]
-        new_tra = [tra[0]]
-        for t in tra:
-            if t[1] == first_index[1]:
-                continue
-            new_tra.append(t)
-            first_index = t
-        return new_tra
-
-    c = 0
-    for trajectory, label, weekday, time_slot in all_trajectories:
+    for trajectory, label, weekday, time_slot in trajectories:
         new_tra = transfer(trajectory, weekday, time_slot)
-        # new_tra = filter(new_tra)
         if len(new_tra) < 10:
-            c += 1
             continue
-        if c < count:
-            train_data.append(new_tra[:10])
-            train_labels.append(label)
-        else:
-            test_data.append(new_tra[:10])
-            test_labels.append(label)
-            test_dest.append(list(map(float, trajectory[-1][1:3])))
-        c += 1
+        n_t = []
+        n_t.extend(new_tra[:5])
+        n_t.extend(new_tra[-5:])
+        train_data.append(n_t)
+        train_labels.append(label)
+
+    for trajectory, label, weekday, time_slot in test_trajectories:
+        new_tra = transfer(trajectory, weekday, time_slot)
+        if len(new_tra) < 10:
+            continue
+        n_t = []
+        n_t.extend(new_tra[:5])
+        n_t.extend(new_tra[-5:])
+        test_data.append(n_t)
+        test_labels.append(label)
+        test_dest.append(list(map(float, trajectory[-1][1:3])))
+
     return train_data, train_labels, test_data, test_labels, test_dest, car_to_ix, poi_to_ix, region_to_ix
 
 
@@ -176,6 +160,7 @@ test_loader = Data.DataLoader(
     batch_size=BATCH_SIZE,
     shuffle=True
 )
+
 
 class RNN(nn.Module):
     def __init__(self):
@@ -234,7 +219,6 @@ class RNN(nn.Module):
                         new_vector = torch.cat((new_vector, self.poi_embeds(torch.LongTensor([item[2].item()]))[0]))
                         new_vector = torch.cat((new_vector, torch.FloatTensor([item[-2]])))
                         new_vector = torch.cat((new_vector, torch.FloatTensor([item[-1]])))
-
 
             if embedding_vector is None:
                 if gpu_avaliable:
@@ -303,7 +287,7 @@ for epoch in range(EPOCH):
         optimizer.step()  # apply gradients
         del b_x, b_y
 
-        if step % 100000 == 0:
+        if step % 10000 == 0:
             all_pred_y = []
             all_test_y = []
             all_test_d = []
@@ -323,8 +307,6 @@ for epoch in range(EPOCH):
                 all_pred_y.extend(pred_y)
                 all_test_y.extend(list(t_y.data.cpu().numpy()))
                 all_test_d.extend(list(t_d.data.cpu().numpy()))
-            # accuracy = torch.sum(torch.LongTensor(all_pred_y) == torch.LongTensor(all_test_y)).type(torch.FloatTensor) / len(all_test_y)
-            # print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + '| test accuracy: %.4f' % accuracy
             print_out = 'Epoch: ' + str(epoch) + '| train loss: %.4f' % loss.data.cpu().numpy() + \
                         '| test accuracy: %.4f' % Evaluate.accuracy(all_pred_y, all_test_y) + \
                         '| test MAE: %.4f' % Evaluate.MAE(all_pred_y, all_test_d) + \
@@ -332,13 +314,4 @@ for epoch in range(EPOCH):
             print(print_out)
             elogger.log(str(print_out))
 
-torch.save(rnn.state_dict(), 'cnn_lstm_prediction_new_cluster.pkl')
-
-# print 10 predictions from test data
-# test_output = rnn(test_data[:10].view(-1, 10, 5))
-# if gpu_avaliable:
-#     pred_y = torch.max(test_output, 1)[1].cuda().data
-# else:
-#     pred_y = torch.max(test_output, 1)[1].data.numpy()
-# print(pred_y, 'prediction number')
-# print(test_labels[:10], 'real number')
+torch.save(rnn.state_dict(), 'cnn_lstm_prediction.pkl')

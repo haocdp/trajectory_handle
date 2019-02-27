@@ -1,10 +1,11 @@
 # ！/usr/bin/env python3
 import csv
 import numpy as np
+from ast import literal_eval
 
 windows_path = "K:/毕业论文/TaxiData_Porto"
 linux_path = "/root/TaxiData_Porto"
-base_path = linux_path
+base_path = windows_path
 
 
 trajectories = []
@@ -26,10 +27,10 @@ for line in file:
     if line[-2] == 'True':
         continue
 
-    trajectory = line[-1]
+    trajectory = literal_eval(line[-1])
     for point in trajectory:
-        lng = float(point[0])
-        lat = float(point[1])
+        lng = point[0]
+        lat = point[1]
         if lng < min_lng:
             min_lng = lng
         if lng > max_lng:
