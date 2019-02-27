@@ -13,10 +13,7 @@ import csv
 
 windows_path = "K:/毕业论文/TaxiData_Porto"
 linux_path = "/root/TaxiData_Porto"
-base_path = linux_path
-
-file_path = "2014-10-20"
-dir_path = "/trajectory/"
+base_path = windows_path
 
 
 # 加载聚类数据
@@ -132,20 +129,20 @@ def classify_point(filepath, result_filepath):
         # print("cost time: {}".format(end_time - start_time))
         if count % 1000 == 0:
             print("has finish: {} %".format(float(count) / all_count * 100))
-    np.save(base_path + "/trajectory_result", trajectories)
+    np.save(result_filepath, trajectories)
 
 
 def run():
-    filepath = base_path + "/train.csv"
-    result_filepath = base_path + dir_path + "/trajectory_result"
+    filepath = base_path + "/test.csv"
+    result_filepath = base_path + "/test_trajectory_result"
     classify_point(filepath, result_filepath)
 
 
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    filepath = base_path + "/train.csv"
-    result_filepath = base_path + dir_path + "/trajectory_result"
+    filepath = base_path + "/test.csv"
+    result_filepath = base_path + "/test_trajectory_result"
     classify_point(filepath, result_filepath)
 
 
