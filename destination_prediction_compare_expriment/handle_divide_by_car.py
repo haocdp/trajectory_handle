@@ -9,10 +9,11 @@ windows_path = "K:\毕业论文\TaxiData"
 mac_path = "/Volumes/MyZone/毕业论文/TaxiData"
 base_path = linux_path
 
-taxi_size = 1000
+taxi_size = 500
 
 trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-10-20.npy").item()
 taxi_ids = []
+np.save("taxi_ids", taxi_ids)
 
 new_trajectories = {}
 for key in trajectories_by_car.keys():
@@ -84,6 +85,69 @@ for key in taxi_ids:
 
 np.save(base_path + "/divide_by_taxi/car_trajectory_2014-10-26_simplified", new_trajectories)
 print("got 2014-10-26")
+
+
+
+
+trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-11-01.npy").item()
+
+new_trajectories = {}
+for key in taxi_ids:
+    if key in trajectories_by_car:
+        new_trajectories[key] = trajectories_by_car[key]
+
+np.save(base_path + "/divide_by_taxi/car_trajectory_2014-11-01_simplified", new_trajectories)
+print("got 2014-11-01")
+
+trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-11-02.npy").item()
+
+new_trajectories = {}
+for key in taxi_ids:
+    if key in trajectories_by_car:
+        new_trajectories[key] = trajectories_by_car[key]
+
+np.save(base_path + "/divide_by_taxi/car_trajectory_2014-11-02_simplified", new_trajectories)
+print("got 2014-11-02")
+
+trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-11-03.npy").item()
+
+new_trajectories = {}
+for key in taxi_ids:
+    if key in trajectories_by_car:
+        new_trajectories[key] = trajectories_by_car[key]
+
+np.save(base_path + "/divide_by_taxi/car_trajectory_2014-11-03_simplified", new_trajectories)
+print("got 2014-11-03")
+
+trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-11-04.npy").item()
+
+new_trajectories = {}
+for key in taxi_ids:
+    if key in trajectories_by_car:
+        new_trajectories[key] = trajectories_by_car[key]
+
+np.save(base_path + "/divide_by_taxi/car_trajectory_2014-11-04_simplified", new_trajectories)
+print("got 2014-11-04")
+
+trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-11-05.npy").item()
+
+new_trajectories = {}
+for key in taxi_ids:
+    if key in trajectories_by_car:
+        new_trajectories[key] = trajectories_by_car[key]
+
+np.save(base_path + "/divide_by_taxi/car_trajectory_2014-11-05_simplified", new_trajectories)
+print("got 2014-11-05")
+
+trajectories_by_car = np.load(base_path + "/divide_by_taxi/car_trajectory_2014-11-06.npy").item()
+
+new_trajectories = {}
+for key in taxi_ids:
+    if key in trajectories_by_car:
+        new_trajectories[key] = trajectories_by_car[key]
+
+np.save(base_path + "/divide_by_taxi/car_trajectory_2014-11-06_simplified", new_trajectories)
+print("got 2014-11-06")
 
 
 
