@@ -161,7 +161,7 @@ def simplify_line(line):
         return '', ''
 
     records = line.split(",")
-    if not len(records) == 10 or not records[0] == '20141110':
+    if not len(records) == 10 or not records[0] == '20141115':
         return '', ''
     plate_no = records[3][-6:]
     date = records[0][0:4] + '-' + records[0][4:6] + '-' + records[0][6:8]
@@ -202,7 +202,7 @@ def main(argv=None):
     if argv is None:
         argv = sys.argv
 
-    divide_trajectory_by_car(base_path + "/taxiData/rawData/10", "2014-11-10")
+    divide_trajectory_by_car(base_path + "/taxiData/rawData/15", "2014-11-15")
     # divide_trajectory_by_car(base_path + "/taxiData/rawData_test/26", "2014-10-26")
 
 if __name__ == "__main__":
