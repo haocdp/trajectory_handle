@@ -49,8 +49,6 @@ def dis(point, p):
 
 # 根据时间得到每周的第几天和每天时间的什么时刻（1440个timeslot）
 def get_weekday_time(t):
-    t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
-
     date, t = str(t).strip().split(" ")
     week_day = datetime.strptime(date, "%Y-%m-%d").weekday()
     hour, minute, second = t.split(":")
@@ -99,16 +97,16 @@ def classify_point(filepath, result_filepath):
             continue
         if line[-2] == 'True':
             continue
-        trajectory = literal_eval(line[-1])
-        if len(trajectory) == 0:
-            continue
+
 
         taxi_id = line[4]
-        t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(line[5]))
+        t = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(line[5])))
         status = 1
         region = 0
         poi = 0
-        trajectory = line[-1]
+        trajectory = literal_eval(line[-1])
+        if len(trajectory) == 0:
+            continue
 
         new_trajectory = []
         if len(trajectory) <= 10:
