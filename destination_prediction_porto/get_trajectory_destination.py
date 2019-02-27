@@ -11,9 +11,9 @@ import csv
 最后得到的是轨迹序列和轨迹最终的目的地
 """
 
-windows_path = "K:\毕业论文\TaxiData_Porto"
-linux_path = "/root/taxiData"
-base_path = windows_path
+windows_path = "K:/毕业论文/TaxiData_Porto"
+linux_path = "/root/TaxiData_Porto"
+base_path = linux_path
 
 file_path = "2014-10-20"
 dir_path = "/trajectory/"
@@ -21,8 +21,8 @@ dir_path = "/trajectory/"
 
 # 加载聚类数据
 def init():
-    cluster_dataset = list(np.load(base_path + "/cluster/cluster_dataset_new.npy"))
-    labels = list(np.load(base_path + "/cluster/destination_labels_new.npy"))
+    cluster_dataset = list(np.load(base_path + "/cluster/cluster_dataset.npy"))
+    labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
     cluster_dict = {}
     cluster_center_dict = {}
     for index, value in enumerate(labels):
@@ -86,7 +86,7 @@ def classify_point(filepath, result_filepath):
     cluster_dict, cluster_center_dict = init()
 
     trajectories = []
-    file = csv.reader(open("K:/毕业论文/TaxiData_Porto/train.csv", 'r'))
+    file = csv.reader(open(filepath, 'r'))
 
     all_count = len(file)
 
@@ -96,7 +96,7 @@ def classify_point(filepath, result_filepath):
         if not flag:
             flag = True
             continue
-        if line == 'True':
+        if line[-2] == 'True':
             continue
         trajectory = literal_eval(line[-1])
         if len(trajectory) == 0:
