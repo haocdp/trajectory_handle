@@ -1,9 +1,10 @@
+# ！/usr/bin/env python3
 import csv
 import numpy as np
 
 windows_path = "K:/毕业论文/TaxiData_Porto"
 linux_path = "/root/TaxiData_Porto"
-base_path = windows_path
+base_path = linux_path
 
 
 trajectories = []
