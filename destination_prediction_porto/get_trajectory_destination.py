@@ -88,11 +88,12 @@ def classify_point(filepath, result_filepath):
     trajectories = []
     file = csv.reader(open(filepath, 'r'))
 
-    all_count = len(file)
+    all_count = 1710671
 
     count = 0
     flag = False
     for line in file:
+        count += 1
         if not flag:
             flag = True
             continue
@@ -111,7 +112,6 @@ def classify_point(filepath, result_filepath):
 
         new_trajectory = []
         if len(trajectory) <= 10:
-            count += 1
             if count % 1000 == 0:
                 print("has finish: {} %".format(float(count) / all_count * 100))
             continue
@@ -132,7 +132,6 @@ def classify_point(filepath, result_filepath):
         trajectories.append(trajectory_destination)
         # end_time = time.time()
         # print("cost time: {}".format(end_time - start_time))
-        count += 1
         if count % 1000 == 0:
             print("has finish: {} %".format(float(count) / all_count * 100))
     np.save(base_path + "/trajectory_result", trajectories)
