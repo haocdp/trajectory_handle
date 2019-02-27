@@ -1,6 +1,6 @@
 from math import radians, atan, tan, sin, acos, cos, sqrt
 import torch
-from destination_prediction.evaluation import get_cluster_center
+from destination_prediction_porto.evaluation import get_cluster_center
 
 
 class Evaluate:
