@@ -14,7 +14,7 @@ windows_path = "K:/毕业论文/TaxiData"
 linux_path = "/root/taxiData"
 base_path = windows_path
 
-file_path = "2014-10-23"
+file_path = "2014-11-07"
 dir_path = "/trajectory_simplified/"
 
 

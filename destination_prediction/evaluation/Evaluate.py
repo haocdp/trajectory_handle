@@ -2,6 +2,7 @@ from math import radians, atan, tan, sin, acos, cos, sqrt
 import torch
 from destination_prediction.evaluation import get_cluster_center
 from destination_prediction.evaluation import get_region_center
+from haversine import haversine
 
 
 class Evaluate:
@@ -43,7 +44,7 @@ class Evaluate:
             else:
                 pred_point = Evaluate.cluter_center_dict[pred_point]
             test_point = test_y[i]
-            sum_exp_distance += pow(Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0]), 2)
+            sum_exp_distance += pow(haversine((pred_point[1], pred_point[0]), (test_point[1], test_point[0])), 2)
         return sqrt(sum_exp_distance / len(pred_y))
 
     """
@@ -58,7 +59,7 @@ class Evaluate:
             else:
                 pred_point = Evaluate.region_center_dict[pred_point]
             test_point = test_y[i]
-            sum_exp_distance += pow(Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0]),
+            sum_exp_distance += pow(haversine((pred_point[1], pred_point[0]), (test_point[1], test_point[0])),
                                     2)
         return sqrt(sum_exp_distance / len(pred_y))
 
@@ -81,7 +82,7 @@ class Evaluate:
             else:
                 pred_point = Evaluate.cluter_center_dict[pred_point]
             test_point = test_y[i]
-            sum_distance += Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0])
+            sum_distance += haversine((pred_point[1], pred_point[0]), (test_point[1], test_point[0]))
         return sum_distance / len(pred_y)
 
     """
@@ -96,5 +97,5 @@ class Evaluate:
             else:
                 pred_point = Evaluate.region_center_dict[pred_point]
             test_point = test_y[i]
-            sum_distance += Evaluate.get_distance(pred_point[1], pred_point[0], test_point[1], test_point[0])
+            sum_distance += haversine((pred_point[1], pred_point[0]), (test_point[1], test_point[0]))
         return sum_distance / len(pred_y)
