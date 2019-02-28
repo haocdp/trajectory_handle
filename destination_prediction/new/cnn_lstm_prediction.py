@@ -140,7 +140,7 @@ def load_data():
     random.shuffle(all_trajectories)
 
     print("all trajectories num : {}".format(len(all_trajectories)))
-    count = len(all_trajectories) * 0.8
+    count = len(all_trajectories) * 0.95
 
     train_data = []
     train_labels = []
