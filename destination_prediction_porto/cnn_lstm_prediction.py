@@ -43,7 +43,7 @@ LAYER_NUM = 2
 
 linux_path = "/root/TaxiData_Porto"
 windows_path = "K:/毕业论文/TaxiData_Porto"
-base_path = linux_path
+base_path = windows_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels.npy"))
 # label个数
@@ -117,23 +117,38 @@ def load_data():
     for trajectory, label, weekday, time_slot in trajectories:
         new_tra = transfer(trajectory, weekday, time_slot)
         if len(new_tra) < 10:
-            continue
-        n_t = []
-        n_t.extend(new_tra[:5])
-        n_t.extend(new_tra[-5:])
-        train_data.append(n_t)
-        train_labels.append(label)
+            n_t = []
+            n_t.extend(new_tra)
+            for i in range(10 - len(new_tra)):
+                n_t.append(new_tra[-1])
+            train_data.append(n_t)
+            train_labels.append(label)
+        else:
+            for i in range(10, len(new_tra) + 1):
+                n_t = []
+                n_t.extend(new_tra[:5])
+                n_t.extend(new_tra[i - 5:i])
+                train_data.append(n_t)
+                train_labels.append(label)
 
     for trajectory, label, weekday, time_slot in test_trajectories:
         new_tra = transfer(trajectory, weekday, time_slot)
         if len(new_tra) < 10:
-            continue
-        n_t = []
-        n_t.extend(new_tra[:5])
-        n_t.extend(new_tra[-5:])
-        test_data.append(n_t)
-        test_labels.append(label)
-        test_dest.append(list(map(float, trajectory[-1][1:3])))
+            n_t = []
+            n_t.extend(new_tra)
+            for i in range(10 - len(new_tra)):
+                n_t.append(new_tra[-1])
+            test_data.append(n_t)
+            test_labels.append(label)
+            test_dest.append(list(map(float, trajectory[-1][1:3])))
+        else:
+            for i in range(10, len(new_tra) + 1):
+                n_t = []
+                n_t.extend(new_tra[:5])
+                n_t.extend(new_tra[i - 5:i])
+                test_data.append(n_t)
+                test_labels.append(label)
+                test_dest.append(list(map(float, trajectory[-1][1:3])))
 
     return train_data, train_labels, test_data, test_labels, test_dest, car_to_ix, poi_to_ix, region_to_ix
 
