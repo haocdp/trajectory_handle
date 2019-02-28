@@ -2,7 +2,7 @@ import numpy as np
 
 linux_path = "/root/TaxiData_Porto"
 windows_path = "K:/毕业论文/TaxiData_Porto"
-base_path = windows_path
+base_path = linux_path
 
 
 def get_cluster_center():
