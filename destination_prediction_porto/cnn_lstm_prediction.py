@@ -29,7 +29,7 @@ import logger
 from destination_prediction_porto.evaluation.Evaluate import Evaluate
 
 # torch.manual_seed(1)    # reproducible
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # gpu
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"  # gpu
 gpu_avaliable = torch.cuda.is_available()
 
 # Hyper Parameters
