@@ -17,7 +17,7 @@ windows_path = "K:/毕业论文/TaxiData"
 linux_path = "/root/taxiData"
 base_path = linux_path
 
-file_dir = "2014-11-02"
+file_dir = "2014-11-09"
 
 
 # 过滤轨迹，如果轨迹存在连续相同区域，则进行过滤
