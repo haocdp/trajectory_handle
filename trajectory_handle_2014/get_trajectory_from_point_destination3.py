@@ -15,9 +15,9 @@ import numpy as np
 
 windows_path = "K:/毕业论文/TaxiData"
 linux_path = "/root/taxiData"
-base_path = windows_path
+base_path = linux_path
 
-file_dir = "2014-11-13"
+file_dir = "2014-10-28"
 
 
 # 过滤轨迹，如果轨迹存在连续相同区域，则进行过滤
@@ -33,7 +33,7 @@ def filter(tra):
 
 
 def get_weekday_trajectory(path):
-    save_path = base_path + "/trajectory_simplified/" + file_dir
+    save_path = base_path + "/trajectory_without_filter/" + file_dir
 
     file_youke_0 = open(save_path + "/youke_0", "w")
     file_youke_1 = open(save_path + "/youke_1", "w")
@@ -123,7 +123,7 @@ def get_weekday_trajectory(path):
 
 
 def run():
-    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + "_simplified.npy"
+    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + ".npy"
     # weekend_path = "F:\FCD data\\trajectory\weekend"
     get_weekday_trajectory(npy_path)
 
@@ -131,7 +131,7 @@ def run():
 def main(argv=None):
     if argv is None:
         argv = sys.argv
-    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + "_simplified.npy"
+    npy_path = base_path + "/divide_by_taxi/car_trajectory_" + file_dir + ".npy"
     # weekend_path = "F:\FCD data\\trajectory\weekend"
     get_weekday_trajectory(npy_path)
 
