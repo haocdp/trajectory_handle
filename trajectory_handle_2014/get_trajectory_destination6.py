@@ -12,7 +12,7 @@ import time
 
 windows_path = "K:/毕业论文/TaxiData"
 linux_path = "/root/taxiData"
-base_path = windows_path
+base_path = linux_path
 
 file_path = "2014-11-01"
 dir_path = "/trajectory_without_filter/"
