@@ -14,8 +14,8 @@ windows_path = "K:/毕业论文/TaxiData"
 linux_path = "/root/taxiData"
 base_path = windows_path
 
-file_path = "2014-11-05"
-dir_path = "/trajectory_simplified/"
+file_path = "2014-10-27"
+dir_path = "/trajectory_without_filter/"
 
 
 # 加载聚类数据
