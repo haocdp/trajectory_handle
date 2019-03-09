@@ -60,7 +60,8 @@ def load_data():
     print("all trajectories num : {}".format(len(all_trajectories)))
     # count = len(all_trajectories) * 0.8
 
-    region_demand = list(np.load(base_path + "/demand_all/region_demand_without_filter.npy"))
+    # region_demand = list(np.load(base_path + "/demand_all/region_demand_without_filter.npy"))
+    region_demand = None
     if region_demand is None:
         region_demand = []
         for i in range(7):
