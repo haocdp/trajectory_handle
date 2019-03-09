@@ -10,7 +10,7 @@ from shenzhen_map.save_region_grid import main
 
 linux_path = "/root/taxiData"
 windows_path = "F:/TaxiData"
-base_path = windows_path
+base_path = linux_path
 
 
 def get_region_matrix():
