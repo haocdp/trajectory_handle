@@ -42,19 +42,19 @@ elogger = logger.Logger("demand_lstm_prediction")
 
 
 def load_data():
-    net_dataset = np.load(base_path + "/demand_all/net_data_without_filter.npy").tolist()
-    net_dataset_2 = np.load(base_path + "/demand_all/net_data_without_filter.npy").tolist()
-    net_dataset_3 = np.load(base_path + "/demand_all/net_data_without_filter.npy").tolist()
-    net_dataset_4 = np.load(base_path + "/demand_all/net_data_without_filter.npy").tolist()
+    net_dataset_1 = np.load(base_path + "/demand_all/net_data_without_filter_1.npy").tolist()
+    net_dataset_2 = np.load(base_path + "/demand_all/net_data_without_filter_2.npy").tolist()
+    net_dataset_3 = np.load(base_path + "/demand_all/net_data_without_filter_3.npy").tolist()
+    net_dataset_4 = np.load(base_path + "/demand_all/net_data_without_filter_4.npy").tolist()
 
     # 打乱
-    random.shuffle(net_dataset)
+    random.shuffle(net_dataset_1)
     random.shuffle(net_dataset_2)
     random.shuffle(net_dataset_3)
     random.shuffle(net_dataset_4)
 
     single_region_dataset = []
-    for data in net_dataset:
+    for data in net_dataset_1:
         if data[-1] > 10:
             single_region_dataset.append(data)
     for data in net_dataset_2:
