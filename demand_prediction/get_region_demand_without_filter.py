@@ -28,14 +28,14 @@ base_path = linux_path
 def load_data():
 
 
-    filepath1 = base_path + "/trajectory_without_filter/2014-10-27/trajectory_2014-10-27_result.npy"
+    filepath1 = base_path + "/trajectory_without_filter/2014-11-03/trajectory_2014-11-03_result.npy"
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
-    filepath2 = base_path + "/trajectory_without_filter/2014-10-28/trajectory_2014-10-28_result.npy"
-    filepath3 = base_path + "/trajectory_without_filter/2014-10-29/trajectory_2014-10-29_result.npy"
-    filepath4 = base_path + "/trajectory_without_filter/2014-10-31/trajectory_2014-10-31_result.npy"
-    filepath5 = base_path + "/trajectory_without_filter/2014-11-01/trajectory_2014-11-01_result.npy"
-    filepath6 = base_path + "/trajectory_without_filter/2014-11-02/trajectory_2014-11-02_result.npy"
-    # filepath7 = base_path + "/trajectory_without_filter/2014-10-26/trajectory_2014-10-26result_npy.npy"
+    filepath2 = base_path + "/trajectory_without_filter/2014-11-04/trajectory_2014-11-04_result.npy"
+    filepath3 = base_path + "/trajectory_without_filter/2014-11-05/trajectory_2014-11-05_result.npy"
+    filepath4 = base_path + "/trajectory_without_filter/2014-11-06/trajectory_2014-11-06_result.npy"
+    filepath5 = base_path + "/trajectory_without_filter/2014-11-07/trajectory_2014-11-07_result.npy"
+    filepath6 = base_path + "/trajectory_without_filter/2014-11-08/trajectory_2014-11-08_result.npy"
+    filepath7 = base_path + "/trajectory_without_filter/2014-11-09/trajectory_2014-11-09_result.npy"
 
     trajectories1 = list(np.load(filepath1))
     trajectories2 = list(np.load(filepath2))
@@ -43,7 +43,7 @@ def load_data():
     trajectories4 = list(np.load(filepath4))
     trajectories5 = list(np.load(filepath5))
     trajectories6 = list(np.load(filepath6))
-    # trajectories7 = list(np.load(filepath7))
+    trajectories7 = list(np.load(filepath7))
 
     all_trajectories = []
     all_trajectories.extend(trajectories1)
@@ -52,7 +52,7 @@ def load_data():
     all_trajectories.extend(trajectories4)
     all_trajectories.extend(trajectories5)
     all_trajectories.extend(trajectories6)
-    # all_trajectories.extend(trajectories7)
+    all_trajectories.extend(trajectories7)
 
     # 打乱
     # random.shuffle(all_trajectories)
