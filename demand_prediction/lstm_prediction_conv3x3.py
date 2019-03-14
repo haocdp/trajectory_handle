@@ -36,7 +36,7 @@ SEQ_LENGTH = 6
 linux_path = "/root/taxiData"
 windows_path = "K:\毕业论文\TaxiData"
 mac_path = "/Volumes/MyZone/毕业论文/TaxiData"
-base_path = windows_path
+base_path = linux_path
 
 elogger = logger.Logger("demand_lstm_prediction_conv3x3")
 
