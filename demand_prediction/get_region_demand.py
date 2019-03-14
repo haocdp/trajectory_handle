@@ -70,7 +70,7 @@ def load_data():
 
     all_grid, region_to_ix = get_region_matrix()
     for trajectory, label, weekday, time_slot in all_trajectories:
-        if len(trajectory) < 10:
+        if len(trajectory) < 11:
             continue
         time_slot = int(time_slot / 30)
         i, j = region_to_ix[int(trajectory[0][-2])]

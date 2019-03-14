@@ -36,13 +36,13 @@ SEQ_LENGTH = 6
 linux_path = "/root/taxiData"
 windows_path = "K:\毕业论文\TaxiData"
 mac_path = "/Volumes/MyZone/毕业论文/TaxiData"
-base_path = mac_path
+base_path = linux_path
 
 elogger = logger.Logger("demand_lstm_prediction_conv5x5")
 
 
 def load_data():
-    net_dataset = np.load(base_path + "/demand/net_data.npy").tolist()
+    net_dataset = np.load(base_path + "/demand/net_data_without_filter.npy").tolist()
 
     # 打乱
     random.shuffle(net_dataset)

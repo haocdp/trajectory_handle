@@ -42,15 +42,15 @@ elogger = logger.Logger("demand_lstm_prediction_conv3x3")
 
 
 def load_data():
-    net_dataset = np.load(base_path + "/demand/net_data.npy").tolist()
+    net_dataset = np.load(base_path + "/demand/net_data_without_filter.npy").tolist()
 
     # 打乱
     random.shuffle(net_dataset)
 
     single_region_dataset = []
     for data in net_dataset:
-        # if data[-1] > 10:
-        single_region_dataset.append(data)
+        if data[-1] > 10:
+            single_region_dataset.append(data)
     net_dataset = single_region_dataset
 
     print("all data sample num : {}".format(len(net_dataset)))
@@ -227,7 +227,7 @@ for epoch in range(EPOCH):
             print(print_out)
             elogger.log(str(print_out))
 
-# torch.save(rnn.state_dict(), 'params.pkl')
+torch.save(rnn.state_dict(), 'params_without_filter.pkl')
 
 # print 10 predictions from test data
 # test_output = rnn(test_data[:10].view(-1, 10, 5))

@@ -42,7 +42,7 @@ elogger = logger.Logger("demand_lstm_prediction_conv3x3_seqLength_4")
 
 
 def load_data():
-    net_dataset = np.load(base_path + "/demand/net_data_7x7_seq_length_14.npy").tolist()
+    net_dataset = np.load(base_path + "/demand/net_data_without_filter_7x7_seq_length_14.npy").tolist()
 
     # 打乱
     random.shuffle(net_dataset)

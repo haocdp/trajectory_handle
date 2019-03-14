@@ -84,7 +84,7 @@ class RNN(nn.Module):
 model = RNN()
 model.load_state_dict(torch.load('params.pkl'))
 
-dispatcher_data = np.load("K:\毕业论文\TaxiData\demand\dispatcher_data_region_238.npy").tolist()
+dispatcher_data = np.load("K:\毕业论文\TaxiData\demand\dispatcher_data_without_filter_9am.npy").tolist()
 ix = np.load("K:\毕业论文\TaxiData\demand\\region_to_ix.npy").item()
 
 def flatten(o):
