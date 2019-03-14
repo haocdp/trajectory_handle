@@ -26,7 +26,7 @@ base_path = linux_path
 
 
 def load_data():
-    filepath1 = base_path + "/trajectory/2014-11-05/trajectory_2014-11-05_result.npy"
+    filepath1 = base_path + "/trajectory_without_filter/2014-11-05/trajectory_2014-11-05_result.npy"
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
     # filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21_result_npy.npy"
     # filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22_result_npy.npy"
