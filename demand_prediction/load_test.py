@@ -84,8 +84,8 @@ class RNN(nn.Module):
 model = RNN()
 model.load_state_dict(torch.load('params.pkl'))
 
-dispatcher_data = np.load("K:\毕业论文\TaxiData\demand\dispatcher_data_1pm.npy").tolist()
-
+dispatcher_data = np.load("K:\毕业论文\TaxiData\demand\dispatcher_data_region_238.npy").tolist()
+ix = np.load("K:\毕业论文\TaxiData\demand\\region_to_ix.npy").item()
 
 def flatten(o):
     new_seq = []
@@ -119,8 +119,8 @@ test_labels = torch.FloatTensor(test_labels)
 test_dataset = Data.TensorDataset(test_data, test_labels)
 test_loader = Data.DataLoader(
     dataset=test_dataset,
-    batch_size=BATCH_SIZE,
-    shuffle=True
+    batch_size=BATCH_SIZE
+    # shuffle=True
 )
 
 all_pred_y = []
@@ -141,11 +141,11 @@ for t_step, (t_x, t_y) in enumerate(test_loader):
     all_test_y.extend(list(t_y.data.cpu().numpy()))
 
     for i, x in enumerate(t_x):
-        print("region:{}, real value: {}, pred value: {}".format(x[0][2], t_y[i], round(test_output[i].item())))
+        print("region:{}, ix: {}, time_slot: {}, real value: {}, pred value: {}".format(x[0][2], ix[x[0][2].item()], x[0][1].item(), t_y[i], round(test_output[i].item())))
         if t_y[i] < 10:
             region_prediction_dict[x[0][2].item()] = 0
         else:
             region_prediction_dict[x[0][2].item()] = round(test_output[i].item())
 
-np.save("region_prediction_distribution_1pm", region_prediction_dict)
+# np.save("region_prediction_distribution_1pm", region_prediction_dict)
 

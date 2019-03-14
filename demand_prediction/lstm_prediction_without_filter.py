@@ -36,36 +36,36 @@ SEQ_LENGTH = 6
 
 linux_path = "/root/taxiData"
 windows_path = "K:\毕业论文\TaxiData"
-base_path = linux_path
+base_path = windows_path
 
 elogger = logger.Logger("demand_lstm_prediction")
 
 
 def load_data():
     net_dataset_1 = np.load(base_path + "/demand_all/net_data_without_filter_1.npy").tolist()
-    net_dataset_2 = np.load(base_path + "/demand_all/net_data_without_filter_2.npy").tolist()
-    net_dataset_3 = np.load(base_path + "/demand_all/net_data_without_filter_3.npy").tolist()
-    net_dataset_4 = np.load(base_path + "/demand_all/net_data_without_filter_4.npy").tolist()
+    # net_dataset_2 = np.load(base_path + "/demand_all/net_data_without_filter_2.npy").tolist()
+    # net_dataset_3 = np.load(base_path + "/demand_all/net_data_without_filter_3.npy").tolist()
+    # net_dataset_4 = np.load(base_path + "/demand_all/net_data_without_filter_4.npy").tolist()
 
     # 打乱
     random.shuffle(net_dataset_1)
-    random.shuffle(net_dataset_2)
-    random.shuffle(net_dataset_3)
-    random.shuffle(net_dataset_4)
+    # random.shuffle(net_dataset_2)
+    # random.shuffle(net_dataset_3)
+    # random.shuffle(net_dataset_4)
 
     single_region_dataset = []
     for data in net_dataset_1:
-        if data[-1] > 10:
-            single_region_dataset.append(data)
-    for data in net_dataset_2:
-        if data[-1] > 10:
-            single_region_dataset.append(data)
-    for data in net_dataset_3:
-        if data[-1] > 10:
-            single_region_dataset.append(data)
-    for data in net_dataset_4:
-        if data[-1] > 10:
-            single_region_dataset.append(data)
+        # if data[-1] > 10:
+        single_region_dataset.append(data)
+    # for data in net_dataset_2:
+    #     if data[-1] > 10:
+    #         single_region_dataset.append(data)
+    # for data in net_dataset_3:
+    #     if data[-1] > 10:
+    #         single_region_dataset.append(data)
+    # for data in net_dataset_4:
+    #     if data[-1] > 10:
+    #         single_region_dataset.append(data)
     net_dataset = single_region_dataset
 
     print("all data sample num : {}".format(len(net_dataset)))

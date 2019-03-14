@@ -49,8 +49,8 @@ def load_data():
 
     single_region_dataset = []
     for data in net_dataset:
-        if data[-1] > 10:
-            single_region_dataset.append(data)
+        # if data[-1] > 10:
+        single_region_dataset.append(data)
     net_dataset = single_region_dataset
 
     print("all data sample num : {}".format(len(net_dataset)))

@@ -37,7 +37,7 @@ LR = 0.0001  # learning rate
 LAYER_NUM = 2
 
 linux_path = "/root/taxiData"
-windows_path = "H:\TaxiData"
+windows_path = "K:\毕业论文\TaxiData"
 base_path = windows_path
 
 labels = list(np.load(base_path + "/cluster/destination_labels_new.npy"))
@@ -162,7 +162,7 @@ class RNN(nn.Module):
 model = RNN()
 model.load_state_dict(torch.load('cnn_lstm_prediction_new_cluster.pkl', map_location=lambda storage, loc: storage))
 
-youke_trajectories = np.load("youke_trajectories_data_1pm.npy").tolist()
+youke_trajectories = np.load("youke_trajectories_data_9am.npy").tolist()
 car_to_ix = np.load("trajectory_without_filter_car_to_ix.npy").item()
 poi_to_ix = np.load("trajectory_without_filter_poi_to_ix.npy").item()
 region_to_ix = np.load("trajectory_without_filter_region_to_ix.npy").item()
@@ -250,13 +250,13 @@ test_loader = Data.DataLoader(
 """
 all_pred_y = []
 all_pred_time = []
+dest_label = []
 for t_step, (t_x, t_y, t_f_r, t_f_t) in enumerate(test_loader):
     if gpu_avaliable:
         t_x = t_x.cuda()
         t_y = t_y.cuda()
         t_f_r = t_f_r.cuda()
         t_f_t = t_f_t.cuda()
-
 
     t_x = t_x.view(-1, 10, 8)
     test_output = model(t_x)  # (samples, time_step, input_size)
@@ -266,6 +266,7 @@ for t_step, (t_x, t_y, t_f_r, t_f_t) in enumerate(test_loader):
         pred_y = torch.max(test_output, 1)[1].data.numpy()
 
     for ix, pred_label in enumerate(pred_y):
+        dest_label.append(pred_label)
         pred_region = label_to_region(pred_label)
         if not pred_region == -1 and not pred_region == t_f_r[ix]:
             pred_time = region_transition_time[t_f_r[ix]][pred_region]
@@ -278,8 +279,8 @@ for t_step, (t_x, t_y, t_f_r, t_f_t) in enumerate(test_loader):
                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t_f_t[ix].item())),
                     "%Y-%m-%d %H:%M:%S")\
                               + timedelta(minutes=grid_distance * 5)
-                if datetime.strptime("2014-10-22 12:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
-                        datetime.strptime("2014-10-22 13:00:00", "%Y-%m-%d %H:%M:%S"):
+                if datetime.strptime("2014-10-22 08:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
+                        datetime.strptime("2014-10-22 09:00:00", "%Y-%m-%d %H:%M:%S"):
                     all_pred_y.append(pred_region)
                     all_pred_time.append(grid_distance * 5)
             else:
@@ -287,8 +288,8 @@ for t_step, (t_x, t_y, t_f_r, t_f_t) in enumerate(test_loader):
                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t_f_t[ix].item())),
                     "%Y-%m-%d %H:%M:%S")\
                               + timedelta(seconds=pred_time)
-                if datetime.strptime("2014-10-22 12:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
-                        datetime.strptime("2014-10-22 13:00:00", "%Y-%m-%d %H:%M:%S"):
+                if datetime.strptime("2014-10-22 08:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
+                        datetime.strptime("2014-10-22 09:00:00", "%Y-%m-%d %H:%M:%S"):
                     all_pred_y.append(pred_region)
                     all_pred_time.append(int(pred_time / 60))
 
@@ -298,4 +299,6 @@ for ix, region in enumerate(all_pred_y):
         youke_destination_distribution[region] = 1
     else:
         youke_destination_distribution[region] = youke_destination_distribution[region] + 1
-np.save("youke_destination_distribution_1pm", youke_destination_distribution)
+np.save("youke_destination_distribution_9am", youke_destination_distribution)
+
+np.save("dest_label", dest_label)
