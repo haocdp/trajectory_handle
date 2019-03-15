@@ -26,7 +26,7 @@ base_path = linux_path
 
 
 def load_data():
-    filepath1 = base_path + "/trajectory_without_filter/2014-11-05/trajectory_2014-11-05_result.npy"
+    filepath1 = base_path + "/trajectory_without_filter/2014-11-06/trajectory_2014-11-06_result.npy"
     # filepath1 = base_path + "/trajectory/allday/youke_0_result_npy.npy"
     # filepath2 = base_path + "/trajectory/2014-10-21/trajectory_2014-10-21_result_npy.npy"
     # filepath3 = base_path + "/trajectory/2014-10-22/trajectory_2014-10-22_result_npy.npy"
@@ -76,7 +76,7 @@ def load_data():
         i, j = region_to_ix[int(trajectory[0][-2])]
         region_demand[weekday][time_slot][i][j] += 1
 
-    np.save(base_path + "/demand/region_demand_11_05", region_demand)
+    np.save(base_path + "/demand/region_demand_11_06", region_demand)
 
     all_sum = 0
     for i in range(7):
