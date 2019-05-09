@@ -47,6 +47,9 @@ for file_path in file_paths:
                 start_time = datetime.strptime(str(trajectory[0][3]), "%Y-%m-%d %H:%M:%S")
                 end_time = datetime.strptime(str(trajectory[-1][3]), "%Y-%m-%d %H:%M:%S")
 
+                if trajectory[0][1] == trajectory[-1][1] and trajectory[0][2] == trajectory[-1][2]:
+                    continue
+
                 xunke_time += (end_time - start_time).seconds / 60
 
                 start_lng = float(trajectory[0][1])

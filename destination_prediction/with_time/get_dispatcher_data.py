@@ -5,14 +5,14 @@ from ast import literal_eval
 import numpy as np
 
 linux_path = "/root/taxiData"
-windows_path = "H:/TaxiData"
+windows_path = "K:/毕业论文/TaxiData"
 base_path = windows_path + "/trajectory_without_filter/"
 
-kong_start_time = datetime.strptime("2014-10-22 12:30:00", "%Y-%m-%d %H:%M:%S")
-kong_end_time = datetime.strptime("2014-10-22 12:40:00", "%Y-%m-%d %H:%M:%S")
+kong_start_time = datetime.strptime("2014-10-22 18:30:00", "%Y-%m-%d %H:%M:%S")
+kong_end_time = datetime.strptime("2014-10-22 18:40:00", "%Y-%m-%d %H:%M:%S")
 
-you_start_time = datetime.strptime("2014-10-22 12:00:00", "%Y-%m-%d %H:%M:%S")
-you_end_time = datetime.strptime("2014-10-22 12:30:00", "%Y-%m-%d %H:%M:%S")
+you_start_time = datetime.strptime("2014-10-22 18:00:00", "%Y-%m-%d %H:%M:%S")
+you_end_time = datetime.strptime("2014-10-22 18:30:00", "%Y-%m-%d %H:%M:%S")
 
 file_path = "2014-10-22"
 xunke_0 = base_path + file_path + "/xunke_0"
@@ -54,7 +54,7 @@ for xunke_file in xunke:
                 #     else region_kong_taxi_distribution[int(trajectory[index][-1])] + 1
                 has_this_car[trajectory[index][0]] = 1
 
-np.save("region_taxi_distribution_1pm", region_kong_taxi_distribution)
+np.save("region_taxi_distribution_7pm", region_kong_taxi_distribution)
 
 dispatcher_trajectory = []
 youke = base_path + file_path + "/trajectory_2014-10-22result_npy.npy"
@@ -63,4 +63,4 @@ for trajectory, label, weekday, time_slot in youke_trajectories:
     if you_start_time < datetime.strptime(trajectory[0][3], "%Y-%m-%d %H:%M:%S") < you_end_time < datetime.strptime(trajectory[-1][3], "%Y-%m-%d %H:%M:%S"):
         dispatcher_trajectory.append((trajectory, label, weekday, time_slot))
 
-np.save("youke_trajectories_data_1pm", dispatcher_trajectory)
+np.save("youke_trajectories_data_7pm", dispatcher_trajectory)

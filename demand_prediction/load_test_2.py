@@ -158,5 +158,5 @@ for t_step, (t_x, t_y) in enumerate(test_loader):
                 '| test RMSE: %.4f' % Evaluate.RMSE(all_pred_y, all_test_y)
     print(print_out)
 
-# np.save("region_prediction_distribution_1pm", region_prediction_dict)
+# np.save("region_prediction_distribution_without_filter_7pm", region_prediction_dict)
 

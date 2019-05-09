@@ -187,7 +187,8 @@ print(rnn)
 elogger.log(str(rnn))
 
 optimizer = torch.optim.Adam(rnn.parameters(), lr=LR)  # optimize all cnn parameters
-loss_func = nn.MSELoss()
+# loss_func = nn.MSELoss()
+loss_func = nn.L1Loss()
 
 # training and testing
 for epoch in range(EPOCH):

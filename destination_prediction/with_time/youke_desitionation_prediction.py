@@ -162,7 +162,7 @@ class RNN(nn.Module):
 model = RNN()
 model.load_state_dict(torch.load('cnn_lstm_prediction_new_cluster.pkl', map_location=lambda storage, loc: storage))
 
-youke_trajectories = np.load("youke_trajectories_data_9am.npy").tolist()
+youke_trajectories = np.load("youke_trajectories_data_7pm.npy").tolist()
 car_to_ix = np.load("trajectory_without_filter_car_to_ix.npy").item()
 poi_to_ix = np.load("trajectory_without_filter_poi_to_ix.npy").item()
 region_to_ix = np.load("trajectory_without_filter_region_to_ix.npy").item()
@@ -279,8 +279,8 @@ for t_step, (t_x, t_y, t_f_r, t_f_t) in enumerate(test_loader):
                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t_f_t[ix].item())),
                     "%Y-%m-%d %H:%M:%S")\
                               + timedelta(minutes=grid_distance * 5)
-                if datetime.strptime("2014-10-22 08:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
-                        datetime.strptime("2014-10-22 09:00:00", "%Y-%m-%d %H:%M:%S"):
+                if datetime.strptime("2014-10-22 18:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
+                        datetime.strptime("2014-10-22 19:00:00", "%Y-%m-%d %H:%M:%S"):
                     all_pred_y.append(pred_region)
                     all_pred_time.append(grid_distance * 5)
             else:
@@ -288,8 +288,8 @@ for t_step, (t_x, t_y, t_f_r, t_f_t) in enumerate(test_loader):
                     time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t_f_t[ix].item())),
                     "%Y-%m-%d %H:%M:%S")\
                               + timedelta(seconds=pred_time)
-                if datetime.strptime("2014-10-22 08:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
-                        datetime.strptime("2014-10-22 09:00:00", "%Y-%m-%d %H:%M:%S"):
+                if datetime.strptime("2014-10-22 18:30:00", "%Y-%m-%d %H:%M:%S") < arrive_time < \
+                        datetime.strptime("2014-10-22 19:00:00", "%Y-%m-%d %H:%M:%S"):
                     all_pred_y.append(pred_region)
                     all_pred_time.append(int(pred_time / 60))
 
@@ -299,6 +299,6 @@ for ix, region in enumerate(all_pred_y):
         youke_destination_distribution[region] = 1
     else:
         youke_destination_distribution[region] = youke_destination_distribution[region] + 1
-np.save("youke_destination_distribution_9am", youke_destination_distribution)
+np.save("youke_destination_distribution_7pm", youke_destination_distribution)
 
 np.save("dest_label", dest_label)

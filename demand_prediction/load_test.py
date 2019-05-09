@@ -147,5 +147,5 @@ for t_step, (t_x, t_y) in enumerate(test_loader):
         else:
             region_prediction_dict[x[0][2].item()] = round(test_output[i].item())
 
-# np.save("region_prediction_distribution_1pm", region_prediction_dict)
+np.save("region_prediction_distribution_1pm", region_prediction_dict)
 
